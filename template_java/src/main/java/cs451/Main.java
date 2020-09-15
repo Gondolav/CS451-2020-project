@@ -1,27 +1,21 @@
 package cs451;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.Socket;
-
 public class Main {
 
-    private static void handleSignal() {
-        //immediately stop network packet processing
-        System.out.println("Immediately stopping network packet processing.");
+    private static Process pr;
 
-        //write/flush output file if necessary
+    private static void handleSignal() {
+        // Immediately stop network packet processing
+        System.out.println("Immediately stopping network packet processing.");
+        pr.stopNetworkPacketProcessing();
+
+        // Write/flush output file if necessary
         System.out.println("Writing output.");
+        pr.writeOutput();
     }
 
     private static void initSignalHandlers() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                handleSignal();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(Main::handleSignal));
     }
 
     public static void main(String[] args) {
@@ -37,7 +31,7 @@ public class Main {
 
         System.out.println("My id is " + parser.myId() + ".");
         System.out.println("List of hosts is:");
-        for (Host host: parser.hosts()) {
+        for (Host host : parser.hosts()) {
             System.out.println(host.getId() + ", " + host.getIp() + ", " + host.getPort());
         }
 
@@ -49,5 +43,16 @@ public class Main {
         }
 
         BarrierParser.Barrier.waitOnBarrier();
+
+        // Go through each host, find the one associated to our id, create new process
+        for (var host : parser.hosts()) {
+            if (host.getId() == parser.myId()) {
+                // TODO maybe here we should remove from the hosts ourselves; not sure if we should broadcast to ourselves
+                pr = new Process(host.getId(), host.getIp(), host.getPort(), Integer.parseInt(parser.config()), parser.hosts());
+                break;
+            }
+        }
+
+        // start process
     }
 }
