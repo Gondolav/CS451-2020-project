@@ -1,5 +1,8 @@
 package cs451;
 
+import cs451.parser.BarrierParser;
+import cs451.parser.Parser;
+
 public class Main {
 
     private static Process pr;
@@ -48,7 +51,8 @@ public class Main {
         for (var host : parser.hosts()) {
             if (host.getId() == parser.myId()) {
                 // TODO maybe here we should remove from the hosts ourselves; not sure if we should broadcast to ourselves
-                pr = new Process(host.getId(), host.getIp(), host.getPort(), Integer.parseInt(parser.config()), parser.hosts());
+                pr = new Process(host.getId(), host.getIp(), host.getPort(), Integer.parseInt(parser.config()),
+                        parser.hosts(), parser.output());
                 break;
             }
         }
