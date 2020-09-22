@@ -21,7 +21,7 @@ public class Main {
         Runtime.getRuntime().addShutdownHook(new Thread(Main::handleSignal));
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Parser parser = new Parser(args);
         parser.parse();
 
@@ -39,24 +39,39 @@ public class Main {
         }
 
         System.out.println("Barrier: " + parser.barrierIp() + ":" + parser.barrierPort());
+        System.out.println("Signal: " + parser.signalIp() + ":" + parser.signalPort());
         System.out.println("Output: " + parser.output());
         // if config is defined; always check before parser.config()
         if (parser.hasConfig()) {
             System.out.println("Config: " + parser.config());
         }
 
-        BarrierParser.Barrier.waitOnBarrier();
 
-        // Go through each host, find the one associated to our id, create new process
-        for (var host : parser.hosts()) {
-            if (host.getId() == parser.myId()) {
-                // TODO maybe here we should remove from the hosts ourselves; not sure if we should broadcast to ourselves
-                pr = new Process(host.getId(), host.getIp(), host.getPort(), Integer.parseInt(parser.config()),
-                        parser.hosts(), parser.output());
-                break;
+        Coordinator coordinator = new Coordinator(parser.myId(), parser.barrierIp(), parser.barrierPort(), parser.signalIp(), parser.signalPort());
+
+	System.out.println("Waiting for all processes for finish initialization");
+        coordinator.waitOnBarrier();
+
+	System.out.println("Broadcasting messages...");
+
+            // Go through each host, find the one associated to our id, create new process
+            for (var host : parser.hosts()) {
+                if (host.getId() == parser.myId()) {
+                    // TODO maybe here we should remove from the hosts ourselves; not sure if we should broadcast to ourselves
+                    pr = new Process(host.getId(), host.getIp(), host.getPort(), Integer.parseInt(parser.config()),
+                            parser.hosts(), parser.output());
+                    break;
+                }
             }
-        }
 
-        // start process
+            // start process
+
+	System.out.println("Signaling end of broadcasting messages");
+        coordinator.finishedBroadcasting();
+
+	while (true) {
+	    // Sleep for 1 hour
+	    Thread.sleep(60 * 60 * 1000);
+	}
     }
 }

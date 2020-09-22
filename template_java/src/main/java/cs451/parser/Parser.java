@@ -12,6 +12,7 @@ public class Parser {
     private IdParser idParser;
     private HostsParser hostsParser;
     private BarrierParser barrierParser;
+    private SignalParser signalParser;
     private OutputParser outputParser;
     private ConfigParser configParser;
 
@@ -25,6 +26,7 @@ public class Parser {
         idParser = new IdParser();
         hostsParser = new HostsParser();
         barrierParser = new BarrierParser();
+        signalParser = new SignalParser();
         outputParser = new OutputParser();
         configParser = null;
 
@@ -49,6 +51,10 @@ public class Parser {
             help();
         }
 
+        if (!signalParser.populate(args[Constants.SIGNAL_KEY], args[Constants.SIGNAL_VALUE])) {
+            help();
+        }
+
         if (!outputParser.populate(args[Constants.OUTPUT_KEY], args[Constants.OUTPUT_VALUE])) {
             help();
         }
@@ -61,7 +67,7 @@ public class Parser {
     }
 
     private void help() {
-        System.err.println("Usage: --id ID --hosts HOSTS --barrier NAME:PORT --output OUTPUT [config]");
+        System.err.println("Usage: ./run.sh --id ID --hosts HOSTS --barrier NAME:PORT --signal NAME:PORT --output OUTPUT [config]");
         System.exit(1);
     }
 
@@ -79,6 +85,14 @@ public class Parser {
 
     public int barrierPort() {
         return barrierParser.getPort();
+    }
+
+    public String signalIp() {
+        return signalParser.getIp();
+    }
+
+    public int signalPort() {
+        return signalParser.getPort();
     }
 
     public String output() {
