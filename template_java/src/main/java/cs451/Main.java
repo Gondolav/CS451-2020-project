@@ -1,6 +1,5 @@
 package cs451;
 
-import cs451.parser.BarrierParser;
 import cs451.parser.Parser;
 
 public class Main {
@@ -46,32 +45,29 @@ public class Main {
             System.out.println("Config: " + parser.config());
         }
 
+        // Go through each host, find the one associated to our id, create new process and new list of hosts
+        for (var host : parser.hosts()) {
+            if (host.getId() == parser.myId()) {
+                pr = new Process(host.getId(), host.getIp(), host.getPort(), Integer.parseInt(parser.config()), parser.hosts(), parser.output());
+                break;
+            }
+        }
 
         Coordinator coordinator = new Coordinator(parser.myId(), parser.barrierIp(), parser.barrierPort(), parser.signalIp(), parser.signalPort());
 
-	System.out.println("Waiting for all processes for finish initialization");
+        System.out.println("Waiting for all processes for finish initialization");
         coordinator.waitOnBarrier();
 
-	System.out.println("Broadcasting messages...");
+        System.out.println("Broadcasting messages...");
 
-            // Go through each host, find the one associated to our id, create new process
-            for (var host : parser.hosts()) {
-                if (host.getId() == parser.myId()) {
-                    // TODO maybe here we should remove from the hosts ourselves; not sure if we should broadcast to ourselves
-                    pr = new Process(host.getId(), host.getIp(), host.getPort(), Integer.parseInt(parser.config()),
-                            parser.hosts(), parser.output());
-                    break;
-                }
-            }
+        // start process: pr.start()
 
-            // start process
-
-	System.out.println("Signaling end of broadcasting messages");
+        System.out.println("Signaling end of broadcasting messages");
         coordinator.finishedBroadcasting();
 
-	while (true) {
-	    // Sleep for 1 hour
-	    Thread.sleep(60 * 60 * 1000);
-	}
+        while (true) {
+            // Sleep for 1 hour
+            Thread.sleep(60 * 60 * 1000);
+        }
     }
 }

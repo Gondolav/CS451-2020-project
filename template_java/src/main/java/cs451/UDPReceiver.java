@@ -9,14 +9,14 @@ import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UDPReceiver extends Thread {
-    private final Process process;
+    private final Observer observer;
     private DatagramSocket socket;
     private final byte[] buf = new byte[256];
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    public UDPReceiver(Process process, int port) {
-        this.process = process;
+    public UDPReceiver(Observer observer, int port) {
+        this.observer = observer;
         try {
             socket = new DatagramSocket(port);
         } catch (SocketException e) {
@@ -30,7 +30,7 @@ public class UDPReceiver extends Thread {
     }
 
     public void notifyProcess(Message message) {
-        process.logReceivedMessage(message);
+        observer.notify(message);
     }
 
     @Override

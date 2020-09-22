@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 // TODO
-public class Process {
+public class Process implements Observer {
 
     private final int id;
 
@@ -17,7 +17,7 @@ public class Process {
 
     private final int nbMessagesToBroadcast;
 
-    private final List<Host> hosts;
+    private List<Host> hosts;
 
     private final String output;
 
@@ -54,8 +54,13 @@ public class Process {
         }
     }
 
+    @Override
+    public void notify(Message message) {
+        logReceivedMessage(message);
+    }
+
     public void logReceivedMessage(Message message) {
-        logs.add(String.format("d %d %d", message.getSenderNb(), message.getSeqNb()));
+        logs.add(String.format("d %d %d", message.getOriginalSenderNb(), message.getSeqNb()));
     }
 
     public void logSentMessage(Message message) {
