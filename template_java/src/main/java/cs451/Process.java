@@ -42,6 +42,9 @@ public class Process implements Observer {
         for (int i = 0; i < nbMessagesToBroadcast; i++) {
             var message = new Message(i, id, id);
             fifoBroadcast.broadcast(message);
+
+            // Logs broadcasted message
+            logs.add(String.format("b %d", message.getSeqNb()));
         }
     }
 
@@ -66,9 +69,5 @@ public class Process implements Observer {
     @Override
     public void deliver(Message message) {
         logs.add(String.format("d %d %d", message.getOriginalSenderNb(), message.getSeqNb()));
-    }
-
-    public void logSentMessage(Message message) {
-        logs.add(String.format("b %d", message.getSeqNb()));
     }
 }
