@@ -30,7 +30,7 @@ public class UDPReceiver extends Thread {
     }
 
     public void notifyProcess(Message message) {
-        observer.notify(message);
+        observer.deliver(message);
     }
 
     @Override

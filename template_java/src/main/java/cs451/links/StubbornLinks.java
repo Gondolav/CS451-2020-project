@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class StubbornLinks implements Observer {
 
-    private static final int FIVE_SECONDS = 5000;
+    private static final int ONE_SECOND = 1000;
 
     private final Observer observer;
     private final FairLossLinks fairLoss;
@@ -25,7 +25,16 @@ class StubbornLinks implements Observer {
         this.sent = new ConcurrentHashMap<>();
 
         // Implements the timer feature in StubbornLinks
-        timer = new Timer();
+        this.timer = new Timer();
+    }
+
+    void send(Message message, Host host) {
+        fairLoss.send(message, host);
+        sent.put(host, message);
+    }
+
+    void start() {
+        fairLoss.start();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -33,12 +42,7 @@ class StubbornLinks implements Observer {
                     fairLoss.send(entry.getValue(), entry.getKey());
                 }
             }
-        }, 0, FIVE_SECONDS);
-    }
-
-    void send(Message message, Host host) {
-        fairLoss.send(message, host);
-        sent.put(host, message);
+        }, ONE_SECOND, ONE_SECOND);
     }
 
     void stop() {
@@ -47,7 +51,7 @@ class StubbornLinks implements Observer {
     }
 
     @Override
-    public void notify(Message message) { // like deliver
-        observer.notify(message);
+    public void deliver(Message message) { // like deliver
+        observer.deliver(message);
     }
 }

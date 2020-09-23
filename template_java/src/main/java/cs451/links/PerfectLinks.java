@@ -23,15 +23,19 @@ public class PerfectLinks implements Observer {
         stubborn.send(message, host);
     }
 
+    public void start() {
+        stubborn.start();
+    }
+
     public void stop() {
         stubborn.stop();
     }
 
     @Override
-    public void notify(Message message) { // like deliver
+    public void deliver(Message message) {
         if (!delivered.contains(message)) {
             delivered.add(message);
-            observer.notify(message);
+            observer.deliver(message);
         }
     }
 }

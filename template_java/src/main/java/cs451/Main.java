@@ -59,8 +59,7 @@ public class Main {
         coordinator.waitOnBarrier();
 
         System.out.println("Broadcasting messages...");
-
-        // start process: pr.start()
+        pr.startBroadcasting();
 
         System.out.println("Signaling end of broadcasting messages");
         coordinator.finishedBroadcasting();

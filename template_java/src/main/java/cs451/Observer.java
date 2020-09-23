@@ -1,5 +1,5 @@
 package cs451;
 
 public interface Observer {
-    void notify(Message message);
+    void deliver(Message message);
 }

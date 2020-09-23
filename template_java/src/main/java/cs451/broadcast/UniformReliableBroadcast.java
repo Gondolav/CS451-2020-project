@@ -40,19 +40,28 @@ class UniformReliableBroadcast implements Observer {
         beb.broadcast(message);
     }
 
+    void start() {
+        beb.start();
+    }
+
+    void stop() {
+        beb.stop();
+    }
+
     @Override
-    public void notify(Message message) {
+    public void deliver(Message message) {
         ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
         ack.get(message).add(message.getSenderNb());
 
         if (!pending.containsKey(message) || !pending.get(message).contains(message.getOriginalSenderNb())) {
+            pending.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
             pending.get(message).add(message.getOriginalSenderNb());
             beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb()));
         }
 
         if (pending.containsKey(message) && pending.get(message).contains(message.getOriginalSenderNb()) && canDeliver(message) && !delivered.contains(message)) {
             delivered.add(message);
-            observer.notify(message);
+            observer.deliver(message);
         }
     }
 }

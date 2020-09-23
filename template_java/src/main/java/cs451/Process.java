@@ -1,5 +1,7 @@
 package cs451;
 
+import cs451.broadcast.FIFOBroadcast;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,9 +25,7 @@ public class Process implements Observer {
 
     private final ConcurrentLinkedQueue<String> logs = new ConcurrentLinkedQueue<>();
 
-    // TODO some field representing a log of all events
-
-    // TODO instantiate one receiver and multiple senders (one for each message)
+    private final FIFOBroadcast fifoBroadcast;
 
     public Process(int id, String ip, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
@@ -34,10 +34,19 @@ public class Process implements Observer {
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
         this.hosts = new ArrayList<>(hosts);
         this.output = output;
+        this.fifoBroadcast = new FIFOBroadcast(this, hosts, port, id);
+    }
+
+    public void startBroadcasting() {
+        fifoBroadcast.start();
+        for (int i = 0; i < nbMessagesToBroadcast; i++) {
+            var message = new Message(i, id, id);
+            fifoBroadcast.broadcast(message);
+        }
     }
 
     public void stopNetworkPacketProcessing() {
-        // TODO receiver.stopReceiving()
+        fifoBroadcast.stop();
     }
 
     public void writeOutput() {
@@ -55,11 +64,7 @@ public class Process implements Observer {
     }
 
     @Override
-    public void notify(Message message) {
-        logReceivedMessage(message);
-    }
-
-    public void logReceivedMessage(Message message) {
+    public void deliver(Message message) {
         logs.add(String.format("d %d %d", message.getOriginalSenderNb(), message.getSeqNb()));
     }
 

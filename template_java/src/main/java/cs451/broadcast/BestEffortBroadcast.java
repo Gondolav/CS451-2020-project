@@ -26,8 +26,16 @@ class BestEffortBroadcast implements Observer {
         }
     }
 
+    void start() {
+        perfectLinks.start();
+    }
+
+    void stop() {
+        perfectLinks.stop();
+    }
+
     @Override
-    public void notify(Message message) {
-        observer.notify(message);
+    public void deliver(Message message) {
+        observer.deliver(message);
     }
 }
