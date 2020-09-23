@@ -15,7 +15,7 @@ public class PerfectLinks implements Observer {
 
     public PerfectLinks(Observer observer, int port) {
         this.observer = observer;
-        this.stubborn = new StubbornLinks(observer, port);
+        this.stubborn = new StubbornLinks(this, port);
         this.delivered = ConcurrentHashMap.newKeySet();
     }
 
