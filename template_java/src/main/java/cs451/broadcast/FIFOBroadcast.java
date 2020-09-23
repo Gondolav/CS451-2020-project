@@ -22,11 +22,11 @@ public class FIFOBroadcast implements Observer {
     public FIFOBroadcast(Observer observer, List<Host> hosts, int port, int senderNb) {
         this.observer = observer;
         this.urb = new UniformReliableBroadcast(this, hosts, port, senderNb);
-        this.lsn = 0;
+        this.lsn = 1;
         this.pending = ConcurrentHashMap.newKeySet();
 
         int[] nextTmp = new int[hosts.size()];
-        Arrays.fill(nextTmp, 1);
+        Arrays.fill(nextTmp, 2);
         this.next = new AtomicIntegerArray(nextTmp);
 
         this.senderNb = senderNb;

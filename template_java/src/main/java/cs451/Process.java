@@ -39,7 +39,7 @@ public class Process implements Observer {
 
     public void startBroadcasting() {
         fifoBroadcast.start();
-        for (int i = 0; i < nbMessagesToBroadcast; i++) {
+        for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
             var message = new Message(i, id, id);
             fifoBroadcast.broadcast(message);
 
