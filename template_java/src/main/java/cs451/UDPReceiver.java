@@ -47,6 +47,7 @@ public class UDPReceiver extends Thread {
 
             try (var inputStream = new ObjectInputStream(new ByteArrayInputStream(packet.getData()))) {
                 Message message = (Message) inputStream.readObject();
+                System.out.println("A new message: " + message.toString());
                 notifyProcess(message);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
