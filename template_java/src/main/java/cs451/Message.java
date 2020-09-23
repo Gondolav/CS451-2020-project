@@ -1,8 +1,9 @@
 package cs451;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Message {
+public class Message implements Serializable {
 
     private final int seqNb;
     private final int senderNb; // p in the book
