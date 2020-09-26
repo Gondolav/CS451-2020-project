@@ -21,6 +21,7 @@ public class PerfectLinks implements Observer {
 
     public void send(Message message, Host host) {
         stubborn.send(message, host);
+        System.out.println("PerfectLinks send: " + message);
     }
 
     public void start() {
@@ -36,6 +37,7 @@ public class PerfectLinks implements Observer {
         if (!delivered.contains(message)) {
             delivered.add(message);
             observer.deliver(message);
+            System.out.println("PerfectLinks deliver: " + message);
         }
     }
 }
