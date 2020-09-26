@@ -1,7 +1,6 @@
 package cs451;
 
-import cs451.links.FairLossLinks;
-import cs451.links.PerfectLinks;
+import cs451.links.StubbornLinks;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +25,7 @@ public class Process implements Observer {
 
     private final ConcurrentLinkedQueue<String> logs = new ConcurrentLinkedQueue<>();
 
-    private final FairLossLinks fifoBroadcast;
+    private final StubbornLinks fifoBroadcast;
 
     public Process(int id, String ip, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
@@ -35,7 +34,7 @@ public class Process implements Observer {
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
         this.hosts = new ArrayList<>(hosts);
         this.output = output;
-        this.fifoBroadcast = new FairLossLinks(this, port);
+        this.fifoBroadcast = new StubbornLinks(this, port);
 //        this.fifoBroadcast = new FIFOBroadcast(this, hosts, port, id);
     }
 
