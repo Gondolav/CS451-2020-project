@@ -4,10 +4,7 @@ import cs451.Host;
 import cs451.Message;
 import cs451.Observer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UniformReliableBroadcast implements Observer {
@@ -16,7 +13,7 @@ public class UniformReliableBroadcast implements Observer {
     private final List<Host> hosts;
     private final BestEffortBroadcast beb;
     private final Set<Message> delivered;
-    private final Map<Message, Set<Integer>> pending;
+    private final Set<Pair<Integer, Message>> pending;
     private final Map<Message, Set<Integer>> ack;
     private final int senderNb;
 
@@ -25,7 +22,7 @@ public class UniformReliableBroadcast implements Observer {
         this.hosts = new ArrayList<>(hosts);
         this.beb = new BestEffortBroadcast(this, hosts, port);
         this.delivered = ConcurrentHashMap.newKeySet();
-        this.pending = new ConcurrentHashMap<>();
+        this.pending = ConcurrentHashMap.newKeySet();
         this.ack = new ConcurrentHashMap<>();
         this.senderNb = senderNb;
     }
@@ -35,8 +32,7 @@ public class UniformReliableBroadcast implements Observer {
     }
 
     public void broadcast(Message message) {
-        pending.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
-        pending.get(message).add(message.getSenderNb()); // the senderNb will be our own process' id
+        pending.add(new Pair<>(senderNb, message));
         System.out.println("Uniform broadcast: " + message);
         beb.broadcast(message);
     }
@@ -54,18 +50,43 @@ public class UniformReliableBroadcast implements Observer {
         ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
         ack.get(message).add(message.getSenderNb());
 
-        if (!pending.containsKey(message) || !pending.get(message).contains(message.getOriginalSenderNb())) {
-            pending.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
-            pending.get(message).add(message.getOriginalSenderNb());
+        var pair = new Pair<>(message.getOriginalSenderNb(), message);
+        if (!pending.contains(pair)) {
+            pending.add(pair);
             beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb()));
         }
 
-        for (var msg : pending.keySet()) {
+        for (var entry : pending) {
+            var msg = entry.second;
             if (canDeliver(msg) && !delivered.contains(msg)) {
                 delivered.add(msg);
                 System.out.println("Uniform deliver: " + msg);
                 observer.deliver(msg);
             }
+        }
+    }
+
+    private static class Pair<X, Y> {
+        private final X first;
+        private final Y second;
+
+        private Pair(X first, Y second) {
+            this.first = first;
+            this.second = second;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pair<?, ?> pair = (Pair<?, ?>) o;
+            return Objects.equals(first, pair.first) &&
+                    Objects.equals(second, pair.second);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(first, second);
         }
     }
 }
