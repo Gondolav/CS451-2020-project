@@ -29,10 +29,6 @@ public class UDPReceiver extends Thread {
         socket.close();
     }
 
-    public void notifyProcess(Message message) {
-        observer.deliver(message);
-    }
-
     @Override
     public void run() {
         running.set(true);
@@ -47,7 +43,7 @@ public class UDPReceiver extends Thread {
 
             try (var inputStream = new ObjectInputStream(new ByteArrayInputStream(packet.getData()))) {
                 Message message = (Message) inputStream.readObject();
-                notifyProcess(message);
+                observer.deliver(message);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
