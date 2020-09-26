@@ -1,6 +1,6 @@
 package cs451;
 
-import cs451.broadcast.FIFOBroadcast;
+import cs451.links.PerfectLinks;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class Process implements Observer {
 
     private final ConcurrentLinkedQueue<String> logs = new ConcurrentLinkedQueue<>();
 
-    private final FIFOBroadcast fifoBroadcast;
+    private final PerfectLinks fifoBroadcast;
 
     public Process(int id, String ip, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
@@ -34,14 +34,16 @@ public class Process implements Observer {
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
         this.hosts = new ArrayList<>(hosts);
         this.output = output;
-        this.fifoBroadcast = new FIFOBroadcast(this, hosts, port, id);
+        this.fifoBroadcast = new PerfectLinks(this, port);
+//        this.fifoBroadcast = new FIFOBroadcast(this, hosts, port, id);
     }
 
     public void startBroadcasting() {
         fifoBroadcast.start();
         for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
             var message = new Message(i, id, id);
-            fifoBroadcast.broadcast(message);
+//            fifoBroadcast.broadcast(message);
+            fifoBroadcast.send(message, hosts.get(1));
 
             // Logs broadcasted message
             logs.add(String.format("b %d\n", message.getSeqNb()));
