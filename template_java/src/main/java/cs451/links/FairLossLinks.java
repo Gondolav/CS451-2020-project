@@ -16,6 +16,7 @@ class FairLossLinks implements Observer {
     void send(Message message, Host host) {
         UDPSender udpSender = new UDPSender(host.getIp(), host.getPort(), message);
         udpSender.start();
+        System.out.println("FairLoss send: " + message);
     }
 
     void start() {
@@ -27,7 +28,8 @@ class FairLossLinks implements Observer {
     }
 
     @Override
-    public void deliver(Message message) { // like deliver
+    public void deliver(Message message) {
         observer.deliver(message);
+        System.out.println("FairLoss deliver: " + message);
     }
 }
