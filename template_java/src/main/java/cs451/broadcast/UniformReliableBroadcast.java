@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-class UniformReliableBroadcast implements Observer {
+public class UniformReliableBroadcast implements Observer {
 
     private final Observer observer;
     private final List<Host> hosts;
@@ -20,7 +20,7 @@ class UniformReliableBroadcast implements Observer {
     private final Map<Message, Set<Integer>> ack;
     private final int senderNb;
 
-    UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, int senderNb) {
+    public UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, int senderNb) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.beb = new BestEffortBroadcast(this, hosts, port);
@@ -34,17 +34,18 @@ class UniformReliableBroadcast implements Observer {
         return 2 * ack.get(message).size() > (hosts.size() + 1);
     }
 
-    void broadcast(Message message) {
+    public void broadcast(Message message) {
         pending.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
         pending.get(message).add(message.getSenderNb()); // the senderNb will be our own process' id
+        System.out.println("Uniform broadcast: " + message);
         beb.broadcast(message);
     }
 
-    void start() {
+    public void start() {
         beb.start();
     }
 
-    void stop() {
+    public void stop() {
         beb.stop();
     }
 
@@ -61,6 +62,7 @@ class UniformReliableBroadcast implements Observer {
 
         if (pending.containsKey(message) && pending.get(message).contains(message.getOriginalSenderNb()) && canDeliver(message) && !delivered.contains(message)) {
             delivered.add(message);
+            System.out.println("Uniform deliver: " + message);
             observer.deliver(message);
         }
     }
