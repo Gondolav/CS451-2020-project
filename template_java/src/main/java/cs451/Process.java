@@ -70,7 +70,7 @@ public class Process implements Observer {
 
     @Override
     public void deliver(Message message) {
-        System.out.println("Entering here");
         logs.add(String.format("d %d %d\n", message.getOriginalSenderNb(), message.getSeqNb()));
+        System.out.println(logs.toString());
     }
 }
