@@ -60,10 +60,12 @@ public class UniformReliableBroadcast implements Observer {
             beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb()));
         }
 
-        if (canDeliver(message) && !delivered.contains(message)) {
-            delivered.add(message);
-            System.out.println("Uniform deliver: " + message);
-            observer.deliver(message);
+        for (var msg : pending.keySet()) {
+            if (canDeliver(msg) && !delivered.contains(msg)) {
+                delivered.add(msg);
+                System.out.println("Uniform deliver: " + msg);
+                observer.deliver(msg);
+            }
         }
     }
 }
