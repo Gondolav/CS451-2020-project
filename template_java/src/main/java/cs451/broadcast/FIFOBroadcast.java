@@ -34,8 +34,7 @@ public class FIFOBroadcast implements Observer {
     }
 
     public void broadcast(Message message) {
-        ++lsn;
-        urb.broadcast(new Message(lsn, senderNb, message.getOriginalSenderNb()));
+        urb.broadcast(new Message(lsn++, senderNb, message.getOriginalSenderNb()));
     }
 
     public void start() {
