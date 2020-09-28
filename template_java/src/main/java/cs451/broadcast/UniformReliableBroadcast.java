@@ -28,7 +28,7 @@ public class UniformReliableBroadcast implements Observer {
     }
 
     private boolean canDeliver(Message message) {
-        return 2 * ack.get(message).size() > (hosts.size() + 1);
+        return 2 * ack.getOrDefault(message, ConcurrentHashMap.newKeySet()).size() > hosts.size();
     }
 
     public void broadcast(Message message) {
