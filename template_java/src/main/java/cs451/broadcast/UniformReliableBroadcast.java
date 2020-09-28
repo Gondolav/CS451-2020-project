@@ -33,6 +33,9 @@ public class UniformReliableBroadcast implements Observer {
 
     public void broadcast(Message message) {
         pending.add(new Pair<>(senderNb, message));
+        ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
+        ack.get(message).add(message.getSenderNb());
+        ack.get(message).add(senderNb);
         System.out.println("Uniform broadcast: " + message);
         beb.broadcast(message);
     }
@@ -49,6 +52,7 @@ public class UniformReliableBroadcast implements Observer {
     public void deliver(Message message) {
         ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
         ack.get(message).add(message.getSenderNb());
+        ack.get(message).add(senderNb);
 
         var pair = new Pair<>(message.getOriginalSenderNb(), message);
         if (!pending.contains(pair)) {
