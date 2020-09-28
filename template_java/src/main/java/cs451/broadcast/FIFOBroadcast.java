@@ -49,7 +49,7 @@ public class FIFOBroadcast implements Observer {
         pending.add(message);
 
         for (var msg : pending) {
-            if (msg.getSeqNb() == next.get(msg.getSenderNb()) + 1) {
+            if (msg.getSeqNb() == next.get(msg.getSenderNb())) {
                 next.incrementAndGet(msg.getSenderNb());
                 pending.remove(msg);
                 observer.deliver(message);
