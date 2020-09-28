@@ -30,7 +30,6 @@ public class FIFOBroadcast implements Observer {
         this.next = new AtomicIntegerArray(nextTmp);
 
         this.senderNb = senderNb;
-
     }
 
     public void broadcast(Message message) {
@@ -50,7 +49,7 @@ public class FIFOBroadcast implements Observer {
         pending.add(message);
 
         for (var msg : pending) {
-            if (msg.getSeqNb() == next.get(msg.getSenderNb())) {
+            if (msg.getSeqNb() == next.get(msg.getSenderNb()) + 1) {
                 next.incrementAndGet(msg.getSenderNb());
                 pending.remove(msg);
                 observer.deliver(message);
