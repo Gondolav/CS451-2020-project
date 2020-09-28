@@ -7,7 +7,7 @@ import cs451.Observer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class UniformReliableBroadcast implements Observer {
+class UniformReliableBroadcast implements Observer {
 
     private final Observer observer;
     private final List<Host> hosts;
@@ -17,7 +17,7 @@ public class UniformReliableBroadcast implements Observer {
     private final Map<Message, Set<Integer>> ack;
     private final int senderNb;
 
-    public UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, int senderNb) {
+    UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, int senderNb) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.beb = new BestEffortBroadcast(this, hosts, port);
@@ -31,20 +31,19 @@ public class UniformReliableBroadcast implements Observer {
         return 2 * ack.getOrDefault(message, ConcurrentHashMap.newKeySet()).size() > hosts.size();
     }
 
-    public void broadcast(Message message) {
+    void broadcast(Message message) {
         pending.add(new Pair<>(senderNb, message));
         ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
         ack.get(message).add(message.getSenderNb());
         ack.get(message).add(senderNb);
-        System.out.println("Uniform broadcast: " + message);
         beb.broadcast(message);
     }
 
-    public void start() {
+    void start() {
         beb.start();
     }
 
-    public void stop() {
+    void stop() {
         beb.stop();
     }
 
@@ -64,7 +63,6 @@ public class UniformReliableBroadcast implements Observer {
             var msg = entry.second;
             if (canDeliver(msg) && !delivered.contains(msg)) {
                 delivered.add(msg);
-                System.out.println("Uniform deliver: " + msg);
                 observer.deliver(msg);
             }
         }
