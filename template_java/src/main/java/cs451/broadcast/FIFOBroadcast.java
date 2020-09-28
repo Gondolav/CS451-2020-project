@@ -52,7 +52,7 @@ public class FIFOBroadcast implements Observer {
             if (msg.getSeqNb() == next.get(msg.getSenderNb())) {
                 next.incrementAndGet(msg.getSenderNb());
                 pending.remove(msg);
-                observer.deliver(message);
+                observer.deliver(msg);
             }
         }
     }
