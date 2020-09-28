@@ -26,7 +26,7 @@ public class FIFOBroadcast implements Observer {
         this.pending = ConcurrentHashMap.newKeySet();
 
         int[] nextTmp = new int[hosts.size() + 1];
-        Arrays.fill(nextTmp, 2);
+        Arrays.fill(nextTmp, 1);
         this.next = new AtomicIntegerArray(nextTmp);
 
         this.senderNb = senderNb;
