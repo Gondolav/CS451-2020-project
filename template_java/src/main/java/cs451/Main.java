@@ -2,6 +2,13 @@ package cs451;
 
 import cs451.parser.Parser;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public class Main {
 
     private static Process pr;
@@ -41,14 +48,22 @@ public class Main {
         System.out.println("Signal: " + parser.signalIp() + ":" + parser.signalPort());
         System.out.println("Output: " + parser.output());
         // if config is defined; always check before parser.config()
+
+        List<String> configLines = null;
         if (parser.hasConfig()) {
             System.out.println("Config: " + parser.config());
+            try (Stream<String> stream = Files.lines(Paths.get(parser.config()))) {
+                configLines = stream.collect(Collectors.toUnmodifiableList());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
+        int nbMessagesToBroadcast = configLines != null ? Integer.parseInt(configLines.get(0)) : 0;
         // Go through each host, find the one associated to our id, create new process and new list of hosts
         for (var host : parser.hosts()) {
             if (host.getId() == parser.myId()) {
-                pr = new Process(host.getId(), host.getIp(), host.getPort(), Integer.parseInt(parser.config()), parser.hosts(), parser.output());
+                pr = new Process(host.getId(), host.getIp(), host.getPort(), nbMessagesToBroadcast, parser.hosts(), parser.output());
                 break;
             }
         }
