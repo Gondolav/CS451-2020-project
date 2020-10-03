@@ -14,7 +14,8 @@ class FairLossLinks implements Observer {
     FairLossLinks(Observer observer, int port) {
         this.observer = observer;
         this.receiver = new UDPReceiver(this, port);
-        this.threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+//        this.threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        this.threadPool = Executors.newCachedThreadPool();
     }
 
     void send(Message message, Host host) {
