@@ -4,22 +4,15 @@ import cs451.broadcast.FIFOBroadcast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.IntStream;
 
-// TODO
 public class Process implements Observer {
 
     private final int id;
 
-    private final String ip;
-
-    private final int port;
-
     private final int nbMessagesToBroadcast;
-
-    private List<Host> hosts;
 
     private final String output;
 
@@ -27,25 +20,29 @@ public class Process implements Observer {
 
     private final FIFOBroadcast fifoBroadcast;
 
-    public Process(int id, String ip, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
+    public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
-        this.ip = ip;
-        this.port = port;
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
-        this.hosts = new ArrayList<>(hosts);
         this.output = output;
         this.fifoBroadcast = new FIFOBroadcast(this, hosts, port, id);
     }
 
     public void startBroadcasting() {
         fifoBroadcast.start();
-        for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
+        IntStream.rangeClosed(1, nbMessagesToBroadcast + 1).parallel().forEach((i) -> {
             var message = new Message(i, id, id);
             fifoBroadcast.broadcast(message);
 
-            // Logs broadcasted message
+            // Logs broadcast message
             logs.add(String.format("b %d\n", message.getSeqNb()));
-        }
+        });
+//        for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
+//            var message = new Message(i, id, id);
+//            fifoBroadcast.broadcast(message);
+//
+//            // Logs broadcast message
+//            logs.add(String.format("b %d\n", message.getSeqNb()));
+//        }
     }
 
     public void stopNetworkPacketProcessing() {

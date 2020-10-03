@@ -63,7 +63,7 @@ public class Main {
         // Go through each host, find the one associated to our id, create new process and new list of hosts
         for (var host : parser.hosts()) {
             if (host.getId() == parser.myId()) {
-                pr = new Process(host.getId(), host.getIp(), host.getPort(), nbMessagesToBroadcast, parser.hosts(), parser.output());
+                pr = new Process(host.getId(), host.getPort(), nbMessagesToBroadcast, parser.hosts(), parser.output());
                 break;
             }
         }
