@@ -2,6 +2,7 @@ package cs451;
 
 import cs451.broadcast.FIFOBroadcast;
 
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -42,7 +43,7 @@ public class Process implements Observer {
     }
 
     public void writeOutput() {
-        try (var outputStream = new FileOutputStream(output)) {
+        try (var outputStream = new BufferedOutputStream(new FileOutputStream(output))) {
             logs.forEach(s -> {
                 try {
                     outputStream.write(s.getBytes());
