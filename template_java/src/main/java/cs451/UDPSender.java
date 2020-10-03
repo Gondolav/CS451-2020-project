@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.*;
 
-public class UDPSender extends Thread {
+public class UDPSender implements Runnable {
     private DatagramSocket socket;
 
     private InetAddress ip;

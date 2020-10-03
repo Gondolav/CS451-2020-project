@@ -2,20 +2,24 @@ package cs451.links;
 
 import cs451.*;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 class FairLossLinks implements Observer {
 
     private final Observer observer;
     private final UDPReceiver receiver;
-    // TODO we could implement a thread pool made of a certain number of senders to avoid creating too many senders
+    private final ExecutorService threadPool;
 
     FairLossLinks(Observer observer, int port) {
         this.observer = observer;
         this.receiver = new UDPReceiver(this, port);
+        this.threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     void send(Message message, Host host) {
         UDPSender udpSender = new UDPSender(host.getIp(), host.getPort(), message);
-        udpSender.start();
+        threadPool.execute(udpSender);
     }
 
     void start() {
@@ -23,6 +27,7 @@ class FairLossLinks implements Observer {
     }
 
     void stop() {
+        threadPool.shutdownNow();
         receiver.stopReceiving();
     }
 
