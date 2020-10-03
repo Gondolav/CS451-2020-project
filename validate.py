@@ -380,8 +380,8 @@ def main(processes, messages, runscript, broadcastType, logsDir, testConfig):
         initBarrierThread.join()
         print("All processes have been initialized.")
 
-        st.run()
-        print("StressTest is complete.")
+        # st.run()
+        # print("StressTest is complete.")
 
 
         print("Resuming stopped processes.")
