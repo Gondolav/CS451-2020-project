@@ -1,5 +1,6 @@
 package cs451;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -26,7 +27,7 @@ public class UDPSender implements Runnable {
     @Override
     public void run() {
         try (var byteOutputStream = new ByteArrayOutputStream();
-             var outputStream = new ObjectOutputStream(byteOutputStream)) {
+             var outputStream = new ObjectOutputStream(new BufferedOutputStream(byteOutputStream))) {
             outputStream.writeObject(message);
             byte[] data = byteOutputStream.toByteArray();
             var packet = new DatagramPacket(data, data.length, ip, port);
