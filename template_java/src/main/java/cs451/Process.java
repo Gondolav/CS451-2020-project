@@ -2,7 +2,6 @@ package cs451;
 
 import cs451.broadcast.FIFOBroadcast;
 
-import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
