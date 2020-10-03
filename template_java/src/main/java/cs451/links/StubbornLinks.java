@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class StubbornLinks implements Observer {
 
-    private static final int TWO_HUNDRED_MS = 200;
+    private static final int ONE_MS = 1;
 
     private final Observer observer;
     private final FairLossLinks fairLoss;
@@ -42,7 +42,7 @@ class StubbornLinks implements Observer {
                     fairLoss.send(entry.getValue(), entry.getKey());
                 }
             }
-        }, TWO_HUNDRED_MS, TWO_HUNDRED_MS);
+        }, ONE_MS, ONE_MS);
     }
 
     void stop() {
