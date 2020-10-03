@@ -27,7 +27,7 @@ public class UDPSender implements Runnable {
     @Override
     public void run() {
         try (var byteOutputStream = new ByteArrayOutputStream();
-             var outputStream = new ObjectOutputStream(new BufferedOutputStream(byteOutputStream))) {
+             var outputStream = new ObjectOutputStream(byteOutputStream)) {
             outputStream.writeObject(message);
             byte[] data = byteOutputStream.toByteArray();
             var packet = new DatagramPacket(data, data.length, ip, port);
