@@ -1,5 +1,6 @@
 package cs451;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -41,7 +42,7 @@ public class UDPReceiver extends Thread {
                 e.printStackTrace();
             }
 
-            try (var inputStream = new ObjectInputStream(new ByteArrayInputStream(packet.getData()))) {
+            try (var inputStream = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(packet.getData())))) {
                 Message message = (Message) inputStream.readObject();
                 observer.deliver(message);
             } catch (IOException | ClassNotFoundException e) {

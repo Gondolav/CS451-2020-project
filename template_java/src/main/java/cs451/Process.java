@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.IntStream;
 
 public class Process implements Observer {
 
@@ -29,20 +28,13 @@ public class Process implements Observer {
 
     public void startBroadcasting() {
         fifoBroadcast.start();
-        IntStream.rangeClosed(1, nbMessagesToBroadcast + 1).parallel().forEach((i) -> {
+        for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
             var message = new Message(i, id, id);
             fifoBroadcast.broadcast(message);
 
             // Logs broadcast message
             logs.add(String.format("b %d\n", message.getSeqNb()));
-        });
-//        for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
-//            var message = new Message(i, id, id);
-//            fifoBroadcast.broadcast(message);
-//
-//            // Logs broadcast message
-//            logs.add(String.format("b %d\n", message.getSeqNb()));
-//        }
+        }
     }
 
     public void stopNetworkPacketProcessing() {
