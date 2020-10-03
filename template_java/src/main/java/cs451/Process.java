@@ -43,7 +43,7 @@ public class Process implements Observer {
     }
 
     public void writeOutput() {
-        try (var outputStream = new BufferedOutputStream(new FileOutputStream(output))) {
+        try (var outputStream = new FileOutputStream(output)) {
             logs.forEach(s -> {
                 try {
                     outputStream.write(s.getBytes());
