@@ -35,19 +35,14 @@ class StubbornLinks implements Observer {
 
     void start() {
         fairLoss.start();
-        while (true) {
-            for (var entry : sent.entrySet()) {
-                fairLoss.send(entry.getValue(), entry.getKey());
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                for (var entry : sent.entrySet()) {
+                    fairLoss.send(entry.getValue(), entry.getKey());
+                }
             }
-        }
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                for (var entry : sent.entrySet()) {
-//                    fairLoss.send(entry.getValue(), entry.getKey());
-//                }
-//            }
-//        }, ONE_MS, ONE_MS);
+        }, ONE_MS, ONE_MS);
     }
 
     void stop() {
