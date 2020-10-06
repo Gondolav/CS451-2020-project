@@ -1,6 +1,6 @@
 package cs451;
 
-import cs451.broadcast.BestEffortBroadcast;
+import cs451.broadcast.FIFOBroadcast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class Process implements Observer {
 
     private final ConcurrentLinkedQueue<String> logs;
 
-    private final BestEffortBroadcast broadcast;
+    private final FIFOBroadcast broadcast;
 
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
@@ -27,7 +27,7 @@ public class Process implements Observer {
         this.totalNbMessagesInQueue = nbMessagesToBroadcast * (hosts.size() + 1);
         this.output = output;
         this.logs = new ConcurrentLinkedQueue<>();
-        this.broadcast = new BestEffortBroadcast(this, hosts, port);
+        this.broadcast = new FIFOBroadcast(this, hosts, port, id);
     }
 
     public void startBroadcasting() {
@@ -50,7 +50,6 @@ public class Process implements Observer {
     }
 
     public void writeOutput() {
-        System.out.println("Log size" + logs.size());
         try (var outputStream = new FileOutputStream(output)) {
             logs.forEach(s -> {
                 try {

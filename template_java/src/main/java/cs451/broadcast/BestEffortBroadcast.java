@@ -9,13 +9,13 @@ import cs451.links.PerfectLinks;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BestEffortBroadcast implements Observer, Broadcast {
+class BestEffortBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final List<Host> hosts;
     private final PerfectLinks perfectLinks;
 
-    public BestEffortBroadcast(Observer observer, List<Host> hosts, int port) {
+    BestEffortBroadcast(Observer observer, List<Host> hosts, int port) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.perfectLinks = new PerfectLinks(this, port);
