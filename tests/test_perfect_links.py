@@ -13,16 +13,18 @@ def soft_assert(condition, message):
         
 
 # Reading hosts file
-hosts = list(map(lambda x : x.split(), filter(lambda x: len(x) > 0, open('..template_java/hosts', 'r').read().split('\n'))))
+hosts = list(map(lambda x : x.split(), filter(lambda x: len(x) > 0, open('../template_java/hosts', 'r').read().split('\n'))))
 n = int(hosts[0][0])
 hosts = [t[1:] for t in hosts[1:n+1]]
+
+print(hosts)
 
 # Counting processes
 n = len(list(hosts))
 print('There are %d processes' % n)
 
 # Reading logs
-logs = {i: list(filter(lambda x : len(x) > 0, open('..template_java/output%d' % i, 'r').read().split('\n'))) for i in range(1, n + 1)}
+logs = {i: list(filter(lambda x : len(x) > 0, open('../template_java/output%d' % i, 'r').read().split('\n'))) for i in range(1, n + 1)}
 
 print(logs)
 
