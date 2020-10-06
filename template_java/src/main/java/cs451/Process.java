@@ -24,7 +24,7 @@ public class Process implements Observer {
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
-        this.totalNbMessagesInQueue = nbMessagesToBroadcast * hosts.size();
+        this.totalNbMessagesInQueue = nbMessagesToBroadcast * (hosts.size() + 1);
         this.output = output;
         this.logs = new ConcurrentLinkedQueue<>();
         this.broadcast = new BestEffortBroadcast(this, hosts, port);
@@ -41,11 +41,8 @@ public class Process implements Observer {
             logs.add(String.format("b %d\n", message.getSeqNb()));
         }
 
-        System.out.println(totalNbMessagesInQueue);
         while (logs.size() < totalNbMessagesInQueue) {
         }
-
-        System.out.println("Log size" + logs.size());
     }
 
     public void stopNetworkPacketProcessing() {
