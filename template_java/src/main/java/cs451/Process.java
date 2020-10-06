@@ -1,5 +1,6 @@
 package cs451;
 
+import cs451.broadcast.Broadcast;
 import cs451.broadcast.FIFOBroadcast;
 
 import java.io.FileOutputStream;
@@ -17,20 +18,20 @@ public class Process implements Observer {
 
     private final ConcurrentLinkedQueue<String> logs = new ConcurrentLinkedQueue<>();
 
-    private final FIFOBroadcast fifoBroadcast;
+    private final Broadcast broadcast;
 
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
         this.output = output;
-        this.fifoBroadcast = new FIFOBroadcast(this, hosts, port, id);
+        this.broadcast = new FIFOBroadcast(this, hosts, port, id);
     }
 
     public void startBroadcasting() {
-        fifoBroadcast.start();
+        broadcast.start();
         for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
             var message = new Message(i, id, id);
-            fifoBroadcast.broadcast(message);
+            broadcast.broadcast(message);
 
             // Logs broadcast message
             logs.add(String.format("b %d\n", message.getSeqNb()));
@@ -38,7 +39,7 @@ public class Process implements Observer {
     }
 
     public void stopNetworkPacketProcessing() {
-        fifoBroadcast.stop();
+        broadcast.stop();
     }
 
     public void writeOutput() {

@@ -7,7 +7,7 @@ import cs451.Observer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-class UniformReliableBroadcast implements Observer {
+class UniformReliableBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final List<Host> hosts;
@@ -31,7 +31,8 @@ class UniformReliableBroadcast implements Observer {
         return 2 * ack.getOrDefault(message, ConcurrentHashMap.newKeySet()).size() > hosts.size();
     }
 
-    void broadcast(Message message) {
+    @Override
+    public void broadcast(Message message) {
         pending.add(new Pair<>(senderNb, message));
         ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
         ack.get(message).add(message.getSenderNb());
@@ -39,11 +40,13 @@ class UniformReliableBroadcast implements Observer {
         beb.broadcast(message);
     }
 
-    void start() {
+    @Override
+    public void start() {
         beb.start();
     }
 
-    void stop() {
+    @Override
+    public void stop() {
         beb.stop();
     }
 

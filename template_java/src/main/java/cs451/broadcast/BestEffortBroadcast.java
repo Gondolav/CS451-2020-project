@@ -3,12 +3,13 @@ package cs451.broadcast;
 import cs451.Host;
 import cs451.Message;
 import cs451.Observer;
+import cs451.links.Links;
 import cs451.links.PerfectLinks;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class BestEffortBroadcast implements Observer {
+class BestEffortBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final List<Host> hosts;
@@ -20,17 +21,20 @@ class BestEffortBroadcast implements Observer {
         this.perfectLinks = new PerfectLinks(this, port);
     }
 
-    void broadcast(Message message) {
+    @Override
+    public void broadcast(Message message) {
         for (var host : hosts) {
             perfectLinks.send(message, host);
         }
     }
 
-    void start() {
+    @Override
+    public void start() {
         perfectLinks.start();
     }
 
-    void stop() {
+    @Override
+    public void stop() {
         perfectLinks.stop();
     }
 

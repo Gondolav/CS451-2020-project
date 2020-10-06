@@ -5,7 +5,7 @@ import cs451.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-class FairLossLinks implements Observer {
+class FairLossLinks implements Observer, Links {
 
     private final Observer observer;
     private final UDPReceiver receiver;
@@ -17,16 +17,19 @@ class FairLossLinks implements Observer {
         this.threadPool = Executors.newCachedThreadPool();
     }
 
-    void send(Message message, Host host) {
+    @Override
+    public void send(Message message, Host host) {
         UDPSender udpSender = new UDPSender(host.getIp(), host.getPort(), message);
         threadPool.execute(udpSender);
     }
 
-    void start() {
+    @Override
+    public void start() {
         receiver.start();
     }
 
-    void stop() {
+    @Override
+    public void stop() {
         threadPool.shutdownNow();
         receiver.stopReceiving();
     }

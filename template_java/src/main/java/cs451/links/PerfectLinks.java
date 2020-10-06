@@ -7,7 +7,7 @@ import cs451.Observer;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PerfectLinks implements Observer {
+public class PerfectLinks implements Observer, Links {
 
     private final Observer observer;
     private final StubbornLinks stubborn;
@@ -19,14 +19,17 @@ public class PerfectLinks implements Observer {
         this.delivered = ConcurrentHashMap.newKeySet();
     }
 
+    @Override
     public void send(Message message, Host host) {
         stubborn.send(message, host);
     }
 
+    @Override
     public void start() {
         stubborn.start();
     }
 
+    @Override
     public void stop() {
         stubborn.stop();
     }

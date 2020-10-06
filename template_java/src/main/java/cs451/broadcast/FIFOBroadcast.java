@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
-public class FIFOBroadcast implements Observer {
+public class FIFOBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final UniformReliableBroadcast urb;
@@ -32,14 +32,17 @@ public class FIFOBroadcast implements Observer {
         this.senderNb = senderNb;
     }
 
+    @Override
     public void broadcast(Message message) {
         urb.broadcast(new Message(lsn++, senderNb, message.getOriginalSenderNb()));
     }
 
+    @Override
     public void start() {
         urb.start();
     }
 
+    @Override
     public void stop() {
         urb.stop();
     }
