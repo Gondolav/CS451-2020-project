@@ -41,6 +41,7 @@ public class Process implements Observer {
             logs.add(String.format("b %d\n", message.getSeqNb()));
         }
 
+        System.out.println(totalNbMessagesInQueue);
         while (logs.size() < totalNbMessagesInQueue) {
         }
 
