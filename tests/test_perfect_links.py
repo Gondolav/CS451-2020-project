@@ -46,7 +46,9 @@ for key, value in logs.items():
 for key, value in logs.items():
     logs_pls = list(filter(lambda l: l[0] == 'b' in l, value))
     for m in logs_pls:
-        soft_assert(['d', m[1], key] in logs[int(m[1])], "Message {} is never delivered".format(m))
+        for log in logs:
+            soft_assert(['d', m[1], key] in log, "Message {} is never delivered".format(m))
+        
 
 # printing the last line with status
 print("INCORRECT" if were_errors else "CORRECT")
