@@ -14,8 +14,6 @@ def soft_assert(condition, message):
 
 # Reading hosts file
 hosts = list(map(lambda x : x.split(), filter(lambda x: len(x) > 0, open('../template_java/hosts', 'r').read().split('\n'))))
-n = int(hosts[0][0])
-hosts = [t[1:] for t in hosts[1:n+1]]
 
 print(hosts)
 
