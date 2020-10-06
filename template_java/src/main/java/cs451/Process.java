@@ -14,6 +14,8 @@ public class Process implements Observer {
 
     private final int nbMessagesToBroadcast;
 
+    private final int totalNbMessagesInQueue;
+
     private final String output;
 
     private final ConcurrentLinkedQueue<String> logs = new ConcurrentLinkedQueue<>();
@@ -23,6 +25,7 @@ public class Process implements Observer {
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
+        this.totalNbMessagesInQueue = nbMessagesToBroadcast * hosts.size();
         this.output = output;
         this.broadcast = new FIFOBroadcast(this, hosts, port, id);
     }
@@ -36,6 +39,8 @@ public class Process implements Observer {
             // Logs broadcast message
             logs.add(String.format("b %d\n", message.getSeqNb()));
         }
+
+        while (logs.size() < totalNbMessagesInQueue) {}
     }
 
     public void stopNetworkPacketProcessing() {
