@@ -40,7 +40,7 @@ public class Process implements Observer {
             logs.add(String.format("b %d\n", message.getSeqNb()));
         }
 
-        while (logs.size() < totalNbMessagesInQueue) { System.out.println(logs.size()); }
+        while (logs.size() < totalNbMessagesInQueue) { }
     }
 
     public void stopNetworkPacketProcessing() {
