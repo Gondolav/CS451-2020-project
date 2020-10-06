@@ -44,7 +44,6 @@ public class UDPReceiver extends Thread {
 
             try (var inputStream = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(packet.getData())))) {
                 Message message = (Message) inputStream.readObject();
-                System.out.printf("Received message from %d with seq nb %d%n", message.getSenderNb(), message.getSeqNb());
                 observer.deliver(message);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();

@@ -41,6 +41,7 @@ class StubbornLinks implements Observer, Links {
             @Override
             public void run() {
                 for (var entry : sent.entrySet()) {
+                    System.out.println(entry);
                     fairLoss.send(entry.getValue(), entry.getKey());
                 }
             }
