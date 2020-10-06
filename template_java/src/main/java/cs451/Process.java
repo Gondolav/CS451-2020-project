@@ -24,7 +24,7 @@ public class Process implements Observer {
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
-        this.totalNbMessagesInQueue = nbMessagesToBroadcast * (hosts.size() + 1);
+        this.totalNbMessagesInQueue = nbMessagesToBroadcast * hosts.size();
         this.output = output;
         this.logs = new ConcurrentLinkedQueue<>();
         this.broadcast = new FIFOBroadcast(this, hosts, port, id);
