@@ -1,5 +1,4 @@
 import sys, os, math, signal
-import numpy as np
 from time import sleep, time
 
 # Were there errors?
