@@ -1,12 +1,9 @@
 package cs451;
 
-import cs451.broadcast.Broadcast;
-import cs451.broadcast.FIFOBroadcast;
-import cs451.links.PerfectLinks;
+import cs451.broadcast.BestEffortBroadcast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -22,9 +19,7 @@ public class Process implements Observer {
 
     private final ConcurrentLinkedQueue<String> logs;
 
-    private final PerfectLinks broadcast;
-
-    private List<Host> hosts;
+    private final BestEffortBroadcast broadcast;
 
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
@@ -32,9 +27,7 @@ public class Process implements Observer {
         this.totalNbMessagesInQueue = nbMessagesToBroadcast * hosts.size();
         this.output = output;
         this.logs = new ConcurrentLinkedQueue<>();
-        this.hosts = new ArrayList<>(hosts);
-//        this.broadcast = new FIFOBroadcast(this, hosts, port, id);
-        this.broadcast = new PerfectLinks(this, port);
+        this.broadcast = new BestEffortBroadcast(this, hosts, port);
     }
 
     public void startBroadcasting() {
@@ -42,16 +35,14 @@ public class Process implements Observer {
         for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
             var message = new Message(i, id, id);
 
-//            broadcast.broadcast(message);
-            for (var h: hosts) {
-                broadcast.send(message, h);
-            }
+            broadcast.broadcast(message);
 
             // Logs broadcast message
             logs.add(String.format("b %d\n", message.getSeqNb()));
         }
 
-        while (logs.size() < totalNbMessagesInQueue) { }
+        while (logs.size() < totalNbMessagesInQueue) {
+        }
     }
 
     public void stopNetworkPacketProcessing() {
