@@ -9,9 +9,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-class StubbornLinks implements Observer, Links {
+public class StubbornLinks implements Observer, Links {
 
-    private static final int ONE_MS = 1;
+    private static final int HALF_SECOND = 500;
 
     private final Observer observer;
     private final FairLossLinks fairLoss;
@@ -19,7 +19,7 @@ class StubbornLinks implements Observer, Links {
     private final Map<Host, Message> sent;
     private final Timer timer;
 
-    StubbornLinks(Observer observer, int port) {
+    public StubbornLinks(Observer observer, int port) {
         this.observer = observer;
         this.fairLoss = new FairLossLinks(this, port);
         this.sent = new ConcurrentHashMap<>();
@@ -41,11 +41,10 @@ class StubbornLinks implements Observer, Links {
             @Override
             public void run() {
                 for (var entry : sent.entrySet()) {
-                    System.out.println(entry);
                     fairLoss.send(entry.getValue(), entry.getKey());
                 }
             }
-        }, ONE_MS, ONE_MS);
+        }, HALF_SECOND, HALF_SECOND);
     }
 
     @Override
