@@ -27,7 +27,7 @@ logs = {i: list(filter(lambda x : len(x) > 0, open('../template_java/output%d' %
 # Printing how many log messages are in the dict
 for key, value in logs.items():
     print("Process %d: %d messages" % (key, len(value)))
-    logs[key] = [l[2:] for l in value]
+    logs[key] = [l[1:] for l in value]
     logs[key] = [l.split() for l in logs[key]]
 
 # ### No duplication - No message is delivered (to a process) more than once
