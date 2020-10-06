@@ -30,6 +30,8 @@ for key, value in logs.items():
     logs[key] = [l[2:] for l in value]
     logs[key] = [l.split() for l in logs[key]]
 
+print(logs.items()[0])
+
 # ### No duplication - No message is delivered (to a process) more than once
 for key, value in logs.items():
     logs_pld = list(filter(lambda l: l[0] == 'd' in l, value))
