@@ -2,7 +2,7 @@ package cs451;
 
 import cs451.broadcast.Broadcast;
 import cs451.broadcast.FIFOBroadcast;
-import cs451.links.StubbornLinks;
+import cs451.links.PerfectLinks;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class Process implements Observer {
 
     private final ConcurrentLinkedQueue<String> logs;
 
-    private final StubbornLinks broadcast;
+    private final PerfectLinks broadcast;
 
     private List<Host> hosts;
 
@@ -34,7 +34,7 @@ public class Process implements Observer {
         this.logs = new ConcurrentLinkedQueue<>();
         this.hosts = new ArrayList<>(hosts);
 //        this.broadcast = new FIFOBroadcast(this, hosts, port, id);
-        this.broadcast = new StubbornLinks(this, port);
+        this.broadcast = new PerfectLinks(this, port);
     }
 
     public void startBroadcasting() {

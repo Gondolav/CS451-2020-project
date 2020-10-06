@@ -9,7 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class StubbornLinks implements Observer, Links {
+class StubbornLinks implements Observer, Links {
 
     private static final int HALF_SECOND = 500;
 
@@ -19,7 +19,7 @@ public class StubbornLinks implements Observer, Links {
     private final Map<Host, Message> sent;
     private final Timer timer;
 
-    public StubbornLinks(Observer observer, int port) {
+    StubbornLinks(Observer observer, int port) {
         this.observer = observer;
         this.fairLoss = new FairLossLinks(this, port);
         this.sent = new ConcurrentHashMap<>();
