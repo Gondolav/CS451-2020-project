@@ -50,6 +50,7 @@ public class Process implements Observer {
     }
 
     public void writeOutput() {
+        System.out.println("Log size" + logs.size());
         try (var outputStream = new FileOutputStream(output)) {
             logs.forEach(s -> {
                 try {

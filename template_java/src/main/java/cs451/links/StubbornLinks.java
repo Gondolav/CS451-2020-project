@@ -5,6 +5,7 @@ import cs451.Message;
 import cs451.Observer;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +17,7 @@ class StubbornLinks implements Observer, Links {
     private final Observer observer;
     private final FairLossLinks fairLoss;
 
-    private final Map<Host, Message> sent;
+    private final Map<Host, Set<Message>> sent;
     private final Timer timer;
 
     StubbornLinks(Observer observer, int port) {
@@ -31,7 +32,8 @@ class StubbornLinks implements Observer, Links {
     @Override
     public void send(Message message, Host host) {
         fairLoss.send(message, host);
-        sent.put(host, message);
+        sent.computeIfAbsent(host, h -> ConcurrentHashMap.newKeySet());
+        sent.get(host).add(message);
     }
 
     @Override
@@ -41,7 +43,9 @@ class StubbornLinks implements Observer, Links {
             @Override
             public void run() {
                 for (var entry : sent.entrySet()) {
-                    fairLoss.send(entry.getValue(), entry.getKey());
+                    for (var msg : entry.getValue()) {
+                        fairLoss.send(msg, entry.getKey());
+                    }
                 }
             }
         }, HALF_SECOND, HALF_SECOND);
