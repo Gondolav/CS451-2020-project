@@ -43,6 +43,8 @@ public class Process implements Observer {
 
         while (logs.size() < totalNbMessagesInQueue) {
         }
+
+        System.out.println("Log size" + logs.size());
     }
 
     public void stopNetworkPacketProcessing() {
