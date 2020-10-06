@@ -1,6 +1,6 @@
 package cs451;
 
-import cs451.broadcast.FIFOBroadcast;
+import cs451.broadcast.UniformReliableBroadcast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class Process implements Observer {
 
     private final ConcurrentLinkedQueue<String> logs;
 
-    private final FIFOBroadcast broadcast;
+    private final UniformReliableBroadcast broadcast;
 
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
@@ -27,7 +27,7 @@ public class Process implements Observer {
         this.totalNbMessagesInQueue = nbMessagesToBroadcast * hosts.size();
         this.output = output;
         this.logs = new ConcurrentLinkedQueue<>();
-        this.broadcast = new FIFOBroadcast(this, hosts, port, id);
+        this.broadcast = new UniformReliableBroadcast(this, hosts, port, id);
     }
 
     public void startBroadcasting() {

@@ -4,6 +4,7 @@ import cs451.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 
 class FairLossLinks implements Observer, Links {
 
@@ -20,7 +21,11 @@ class FairLossLinks implements Observer, Links {
     @Override
     public void send(Message message, Host host) {
         UDPSender udpSender = new UDPSender(host.getIp(), host.getPort(), message);
-        threadPool.execute(udpSender);
+        try {
+            threadPool.execute(udpSender);
+        } catch (RejectedExecutionException e) {
+            System.out.println("ThreadPool is shut down");
+        }
     }
 
     @Override
