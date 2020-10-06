@@ -29,11 +29,10 @@ for key, value in logs.items():
     print("Process %d: %d messages" % (key, len(value)))
     logs[key] = [l.split() for l in logs[key]]
 
-print(logs)
-
 # ### No duplication - No message is delivered (to a process) more than once
 for key, value in logs.items():
     logs_pld = list(filter(lambda l: l[0] == 'd' in l, value))
+    print(logs_pld)
     s = set([x for x in logs_pld if logs_pld.count(x) > 1])
     soft_assert(0 == len(s), "Some messages have been delived more than once : {}".format(s))
 
