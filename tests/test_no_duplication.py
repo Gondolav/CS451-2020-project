@@ -8,4 +8,4 @@ with open(sys.argv[1]) as file:
 
   c = Counter(lines)
   print(c)
-  print(all(c.values == 1))
+  print(all([v == 1 for v in c.values]))
