@@ -1,11 +1,14 @@
 import sys
-from collections import Counter
+
+def all_unique(x):
+  seen = set()
+  return not any(i in seen or seen.add(i) for i in x)
 
 with open(sys.argv[1]) as file:
   lines = file.readlines()
   lines = [l.split() for l in lines]
-  lines = [l[2] if l[0] == 'd' else l[1] for l in lines]
+  lines_deliver = [(l[1], l[2]) for l in lines if l[0] == 'd']
+  lines_broadcast = [l[1] for l in lines if l[0] == 'b']
 
-  c = Counter(lines)
-  print(c)
-  print(all([v == 1 for v in c.values]))
+  print(f"No duplicates in broadcast : {all_unique(lines_broadcast)}")
+  print(f"No duplicates in delivered : {all_unique(lines_deliver)}")
