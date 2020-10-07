@@ -24,5 +24,5 @@ with open(sys.argv[1]) as file:
               dupes.append(x)
           seen[x] += 1  
 
-  print(dupes)
+  print([(k, v) for (k, v) in seen.items() if v > 1])
   print(len(dupes))
