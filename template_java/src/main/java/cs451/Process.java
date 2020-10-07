@@ -25,7 +25,7 @@ public class Process implements Observer {
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
-        this.totalNbMessagesInQueue = nbMessagesToBroadcast * hosts.size();
+        this.totalNbMessagesInQueue = nbMessagesToBroadcast * (hosts.size() + 1); // remove +1 when using URB
         this.output = output;
         this.logs = new ConcurrentLinkedQueue<>();
         this.broadcast = new BestEffortBroadcast(this, hosts, port);
