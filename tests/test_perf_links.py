@@ -31,8 +31,8 @@ def validity(lines1, lines2):
 
   print(len(set(lines_broadcast) - set(lines_deliver)))
 
-with open(sys.argv[1]) as file1:
-  with open(sys.argv[2]) as file2:
+with open(sys.argv[2]) as file1:
+  with open(sys.argv[3]) as file2:
     lines1 = file1.readlines()
     lines1 = [l.split() for l in lines1]
 
