@@ -1,5 +1,6 @@
 package cs451;
 
+import cs451.broadcast.BestEffortBroadcast;
 import cs451.broadcast.UniformReliableBroadcast;
 
 import java.io.FileOutputStream;
@@ -19,7 +20,7 @@ public class Process implements Observer {
 
     private final ConcurrentLinkedQueue<String> logs;
 
-    private final UniformReliableBroadcast broadcast;
+    private final BestEffortBroadcast broadcast;
 
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
@@ -27,7 +28,7 @@ public class Process implements Observer {
         this.totalNbMessagesInQueue = nbMessagesToBroadcast * hosts.size();
         this.output = output;
         this.logs = new ConcurrentLinkedQueue<>();
-        this.broadcast = new UniformReliableBroadcast(this, hosts, port, id);
+        this.broadcast = new BestEffortBroadcast(this, hosts, port);
     }
 
     public void startBroadcasting() {
