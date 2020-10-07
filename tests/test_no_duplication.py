@@ -13,4 +13,16 @@ with open(sys.argv[1]) as file:
   print(f"No duplicates in broadcast : {all_unique(lines_broadcast)}")
   print(f"No duplicates in delivered : {all_unique(lines_deliver)}")
 
-  print(lines_deliver)
+  seen = {}
+  dupes = []
+
+  for x in lines_deliver:
+      if x not in seen:
+          seen[x] = 1
+      else:
+          if seen[x] == 1:
+              dupes.append(x)
+          seen[x] += 1  
+
+  print(dupes)
+  print(len(dupes))
