@@ -33,7 +33,7 @@ public class UniformReliableBroadcast implements Observer, Broadcast {
 
     @Override
     public void broadcast(Message message) {
-        pending.add(new Pair<>(senderNb, message));
+        pending.add(new Pair<>(message.getSenderNb(), message));
         ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
         ack.get(message).add(message.getSenderNb());
         ack.get(message).add(senderNb);
