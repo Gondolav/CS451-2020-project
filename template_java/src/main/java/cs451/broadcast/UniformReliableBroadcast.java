@@ -4,42 +4,39 @@ import cs451.Host;
 import cs451.Message;
 import cs451.Observer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class UniformReliableBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final List<Host> hosts;
     private final BestEffortBroadcast beb;
-    private final Map<Message, AtomicInteger> delivered;
-    private final Map<Message, AtomicInteger> pending;
-    private final Map<Message, AtomicInteger> ack;
+    private final Set<Message> delivered;
+    private final Set<Pair<Integer, Message>> pending;
+    private final Map<Message, Set<Integer>> ack;
     private final int senderNb;
 
     public UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, int senderNb) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.beb = new BestEffortBroadcast(this, hosts, port);
-        this.delivered = new ConcurrentHashMap<>();
-        this.pending = new ConcurrentHashMap<>();
+        this.delivered = ConcurrentHashMap.newKeySet();
+        this.pending = ConcurrentHashMap.newKeySet();
         this.ack = new ConcurrentHashMap<>();
         this.senderNb = senderNb;
     }
 
     private boolean canDeliver(Message message) {
-        return 2 * ack.getOrDefault(message, new AtomicInteger(0)).get() > hosts.size();
+        return 2 * ack.getOrDefault(message, ConcurrentHashMap.newKeySet()).size() > hosts.size();
     }
 
     @Override
     public void broadcast(Message message) {
-        pending.put(message, new AtomicInteger(1));
-//        ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
-//        ack.get(message).add(message.getSenderNb());
-//        ack.get(message).add(senderNb);
+        pending.add(new Pair<>(message.getSenderNb(), message));
+        ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
+        ack.get(message).add(message.getSenderNb());
+        ack.get(message).add(senderNb);
         beb.broadcast(message);
     }
 
@@ -55,17 +52,46 @@ public class UniformReliableBroadcast implements Observer, Broadcast {
 
     @Override
     public void deliver(Message message) {
-        ack.computeIfAbsent(message, m -> new AtomicInteger(0));
-        ack.get(message).incrementAndGet();
+        ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
+        ack.get(message).add(message.getSenderNb());
+        ack.get(message).add(senderNb);
 
-        if (!pending.containsKey(message)) {
-            pending.put(message, new AtomicInteger(1));
-            beb.broadcast(message);
+        var pair = new Pair<>(message.getOriginalSenderNb(), message);
+        if (!pending.contains(pair)) {
+            pending.add(pair);
+            beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb()));
         }
 
-        if (canDeliver(message) && !delivered.containsKey(message)) {
-            delivered.put(message, new AtomicInteger(1));
-            observer.deliver(message);
+        for (var entry : pending) {
+            var msg = entry.second;
+            if (canDeliver(msg) && !delivered.contains(msg)) {
+                delivered.add(msg);
+                observer.deliver(msg);
+            }
+        }
+    }
+
+    private static class Pair<X, Y> {
+        private final X first;
+        private final Y second;
+
+        private Pair(X first, Y second) {
+            this.first = first;
+            this.second = second;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pair<?, ?> pair = (Pair<?, ?>) o;
+            return Objects.equals(first, pair.first) &&
+                    Objects.equals(second, pair.second);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(first, second);
         }
     }
 }
