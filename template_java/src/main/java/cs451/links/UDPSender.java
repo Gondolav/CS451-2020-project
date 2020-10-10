@@ -1,19 +1,20 @@
-package cs451;
+package cs451.links;
 
-import java.io.BufferedOutputStream;
+import cs451.Message;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.*;
 
-public class UDPSender implements Runnable {
+class UDPSender implements Runnable {
     private DatagramSocket socket;
 
     private InetAddress ip;
     private int port;
     private Message message;
 
-    public UDPSender(String ip, int port, Message message) {
+    UDPSender(String ip, int port, Message message) {
         try {
             this.ip = InetAddress.getByName(ip);
             this.port = port;

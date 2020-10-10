@@ -1,4 +1,7 @@
-package cs451;
+package cs451.links;
+
+import cs451.Message;
+import cs451.Observer;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -9,14 +12,14 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class UDPReceiver extends Thread {
+class UDPReceiver extends Thread {
     private final Observer observer;
     private DatagramSocket socket;
     private final byte[] buf = new byte[256];
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    public UDPReceiver(Observer observer, int port) {
+    UDPReceiver(Observer observer, int port) {
         this.observer = observer;
         try {
             socket = new DatagramSocket(port);
