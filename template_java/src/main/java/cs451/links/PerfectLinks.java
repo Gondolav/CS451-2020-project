@@ -4,6 +4,7 @@ import cs451.Host;
 import cs451.Message;
 import cs451.Observer;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,9 +14,9 @@ public class PerfectLinks implements Observer, Links {
     private final StubbornLinks stubborn;
     private final Set<Message> delivered;
 
-    public PerfectLinks(Observer observer, int port) {
+    public PerfectLinks(Observer observer, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
         this.observer = observer;
-        this.stubborn = new StubbornLinks(this, port);
+        this.stubborn = new StubbornLinks(this, port, senderNbToHosts, senderNb);
         this.delivered = ConcurrentHashMap.newKeySet();
     }
 

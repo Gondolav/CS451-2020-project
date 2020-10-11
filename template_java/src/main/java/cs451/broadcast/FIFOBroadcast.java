@@ -6,6 +6,7 @@ import cs451.Observer;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicIntegerArray;
@@ -19,9 +20,9 @@ public class FIFOBroadcast implements Observer, Broadcast {
     private final AtomicIntegerArray next;
     private final int senderNb;
 
-    public FIFOBroadcast(Observer observer, List<Host> hosts, int port, int senderNb) {
+    public FIFOBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
         this.observer = observer;
-        this.urb = new UniformReliableBroadcast(this, hosts, port, senderNb);
+        this.urb = new UniformReliableBroadcast(this, hosts, port, senderNbToHosts, senderNb);
         this.lsn = 1;
         this.pending = ConcurrentHashMap.newKeySet();
 
@@ -34,7 +35,7 @@ public class FIFOBroadcast implements Observer, Broadcast {
 
     @Override
     public void broadcast(Message message) {
-        urb.broadcast(new Message(lsn++, senderNb, message.getOriginalSenderNb()));
+        urb.broadcast(new Message(lsn++, senderNb, message.getOriginalSenderNb(), message.isAck()));
     }
 
     @Override

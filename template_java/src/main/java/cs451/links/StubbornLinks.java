@@ -4,10 +4,7 @@ import cs451.Host;
 import cs451.Message;
 import cs451.Observer;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 class StubbornLinks implements Observer, Links {
@@ -20,13 +17,21 @@ class StubbornLinks implements Observer, Links {
     private final Map<Host, Set<Message>> sent;
     private final Timer timer;
 
-    StubbornLinks(Observer observer, int port) {
+    private final Map<Integer, Host> senderNbToHosts;
+
+    private final int senderNb;
+
+    StubbornLinks(Observer observer, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
         this.observer = observer;
         this.fairLoss = new FairLossLinks(this, port);
         this.sent = new ConcurrentHashMap<>();
 
         // Implements the timer feature in StubbornLinks
         this.timer = new Timer();
+
+        this.senderNbToHosts = new HashMap<>(senderNbToHosts);
+
+        this.senderNb = senderNb;
     }
 
     @Override
@@ -59,6 +64,13 @@ class StubbornLinks implements Observer, Links {
 
     @Override
     public void deliver(Message message) {
-        observer.deliver(message);
+        var senderHost = senderNbToHosts.get(message.getSenderNb());
+
+        if (message.isAck()) {
+            sent.get(senderHost).removeIf(m -> m.getSeqNb() == message.getSeqNb());
+        } else {
+            send(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), true), senderHost);
+            observer.deliver(message);
+        }
     }
 }

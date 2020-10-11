@@ -8,11 +8,13 @@ public class Message implements Serializable {
     private final int seqNb;
     private final int senderNb; // p in the book
     private final int originalSenderNb; // s in the book
+    private final boolean isAck;
 
-    public Message(int seqNb, int senderNb, int originalSenderNb) {
+    public Message(int seqNb, int senderNb, int originalSenderNb, boolean isAck) {
         this.seqNb = seqNb;
         this.senderNb = senderNb;
         this.originalSenderNb = originalSenderNb;
+        this.isAck = isAck;
     }
 
     public int getSeqNb() {
@@ -27,6 +29,10 @@ public class Message implements Serializable {
         return originalSenderNb;
     }
 
+    public boolean isAck() {
+        return isAck;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -34,12 +40,13 @@ public class Message implements Serializable {
         Message message = (Message) o;
         return seqNb == message.seqNb &&
                 senderNb == message.senderNb &&
-                originalSenderNb == message.originalSenderNb;
+                originalSenderNb == message.originalSenderNb &&
+                isAck == message.isAck;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(seqNb, senderNb, originalSenderNb);
+        return Objects.hash(seqNb, senderNb, originalSenderNb, isAck);
     }
 
     @Override
@@ -48,6 +55,7 @@ public class Message implements Serializable {
                 "seqNb=" + seqNb +
                 ", senderNb=" + senderNb +
                 ", originalSenderNb=" + originalSenderNb +
+                ", isAck=" + isAck +
                 '}';
     }
 }

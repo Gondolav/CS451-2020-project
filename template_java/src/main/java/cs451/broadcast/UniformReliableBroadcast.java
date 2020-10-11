@@ -17,10 +17,10 @@ public class UniformReliableBroadcast implements Observer, Broadcast {
     private final Map<Message, Set<Integer>> ack;
     private final int senderNb;
 
-    public UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, int senderNb) {
+    public UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
-        this.beb = new BestEffortBroadcast(this, hosts, port);
+        this.beb = new BestEffortBroadcast(this, hosts, port, senderNbToHosts, senderNb);
         this.delivered = ConcurrentHashMap.newKeySet();
         this.pending = ConcurrentHashMap.newKeySet();
         this.ack = new ConcurrentHashMap<>();
@@ -59,7 +59,7 @@ public class UniformReliableBroadcast implements Observer, Broadcast {
         var pair = new Pair<>(message.getOriginalSenderNb(), message);
         if (!pending.contains(pair)) {
             pending.add(pair);
-            beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb()));
+            beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), message.isAck()));
         }
 
         for (var entry : pending) {

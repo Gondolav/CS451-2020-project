@@ -1,11 +1,12 @@
 package cs451;
 
-import cs451.broadcast.FIFOBroadcast;
 import cs451.broadcast.UniformReliableBroadcast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Process implements Observer {
@@ -28,13 +29,19 @@ public class Process implements Observer {
         this.totalNbMessagesInQueue = nbMessagesToBroadcast * hosts.size(); // add +1 when using BEB
         this.output = output;
         this.logs = new ConcurrentLinkedQueue<>();
-        this.broadcast = new UniformReliableBroadcast(this, hosts, port, id);
+
+        Map<Integer, Host> senderNbToHosts = new HashMap<>();
+        for (var host : hosts) {
+            senderNbToHosts.put(host.getId(), host);
+        }
+
+        this.broadcast = new UniformReliableBroadcast(this, hosts, port, senderNbToHosts, id);
     }
 
     public void startBroadcasting() {
         broadcast.start();
         for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
-            var message = new Message(i, id, id);
+            var message = new Message(i, id, id, false);
 
             broadcast.broadcast(message);
 
