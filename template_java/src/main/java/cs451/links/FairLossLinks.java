@@ -1,6 +1,8 @@
 package cs451.links;
 
-import cs451.*;
+import cs451.Host;
+import cs451.Message;
+import cs451.Observer;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,7 +17,7 @@ class FairLossLinks implements Observer, Links {
     FairLossLinks(Observer observer, int port) {
         this.observer = observer;
         this.receiver = new UDPReceiver(this, port);
-        this.threadPool = Executors.newCachedThreadPool();
+        this.threadPool = Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() + 1) * 30);
     }
 
     @Override
