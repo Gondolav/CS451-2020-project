@@ -50,6 +50,7 @@ public class Process implements Observer {
             // Logs broadcast message
             logs.add(String.format("b %d\n", message.getSeqNb()));
 
+            // TODO remove
             if (i % 1000 == 0) {
                 try {
                     TimeUnit.MILLISECONDS.sleep(500);
