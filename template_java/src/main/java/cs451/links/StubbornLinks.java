@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class StubbornLinks implements Observer, Links {
 
-    private static final int TWO_SECONDS = 2000;
+    private static final int HALF_SECOND = 500;
 
     private final Observer observer;
     private final FairLossLinks fairLoss;
@@ -52,7 +52,7 @@ class StubbornLinks implements Observer, Links {
                     }
                 }
             }
-        }, TWO_SECONDS, TWO_SECONDS);
+        }, HALF_SECOND, HALF_SECOND);
     }
 
     @Override

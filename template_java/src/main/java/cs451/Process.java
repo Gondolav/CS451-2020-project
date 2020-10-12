@@ -1,7 +1,6 @@
 package cs451;
 
 import cs451.broadcast.BestEffortBroadcast;
-import cs451.broadcast.UniformReliableBroadcast;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 public class Process implements Observer {
 
@@ -41,6 +41,7 @@ public class Process implements Observer {
 
     public void startBroadcasting() {
         broadcast.start();
+
         for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
             var message = new Message(i, id, id, false);
 
@@ -48,6 +49,14 @@ public class Process implements Observer {
 
             // Logs broadcast message
             logs.add(String.format("b %d\n", message.getSeqNb()));
+
+            if (i % 1000 == 0) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         while (logs.size() < totalNbMessagesInQueue) {
