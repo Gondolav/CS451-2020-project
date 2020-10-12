@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class BestEffortBroadcast implements Observer, Broadcast {
+public class BestEffortBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final List<Host> hosts;
     private final PerfectLinks perfectLinks;
 
-    BestEffortBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
+    public BestEffortBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.perfectLinks = new PerfectLinks(this, port, senderNbToHosts, senderNb);

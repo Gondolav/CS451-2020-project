@@ -26,7 +26,6 @@ class StubbornLinks implements Observer, Links {
         this.fairLoss = new FairLossLinks(this, port);
         this.sent = new ConcurrentHashMap<>();
 
-        // Implements the timer feature in StubbornLinks
         this.timer = new Timer();
 
         this.senderNbToHosts = new HashMap<>(senderNbToHosts);
