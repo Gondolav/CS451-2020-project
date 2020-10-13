@@ -7,7 +7,7 @@ import cs451.Observer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class UniformReliableBroadcast implements Observer, Broadcast {
+class UniformReliableBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final List<Host> hosts;
@@ -17,7 +17,7 @@ public class UniformReliableBroadcast implements Observer, Broadcast {
     private final Map<Message, Set<Integer>> ack;
     private final int senderNb;
 
-    public UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
+    UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.beb = new BestEffortBroadcast(this, hosts, port, senderNbToHosts, senderNb);

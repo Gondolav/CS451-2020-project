@@ -1,5 +1,6 @@
 package cs451;
 
+import cs451.broadcast.Broadcast;
 import cs451.broadcast.FIFOBroadcast;
 
 import java.io.FileOutputStream;
@@ -19,7 +20,7 @@ public class Process implements Observer {
 
     private final ConcurrentLinkedQueue<String> logs;
 
-    private final FIFOBroadcast broadcast;
+    private final Broadcast broadcast;
 
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
