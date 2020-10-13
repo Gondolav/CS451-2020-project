@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class UDPReceiver extends Thread {
     private final Observer observer;
     private DatagramSocket socket;
-    private final byte[] buf = new byte[256];
+    private final byte[] buf = new byte[65535];
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 

@@ -8,15 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
 
 public class Process implements Observer {
 
     private final int id;
 
     private final int nbMessagesToBroadcast;
-
-    private final int totalNbMessagesInQueue;
 
     private final String output;
 
@@ -27,7 +24,6 @@ public class Process implements Observer {
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
         this.id = id;
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
-        this.totalNbMessagesInQueue = nbMessagesToBroadcast * (hosts.size() + 1); // remove +1 when using URB
         this.output = output;
         this.logs = new ConcurrentLinkedQueue<>();
 
@@ -49,18 +45,6 @@ public class Process implements Observer {
 
             // Logs broadcast message
             logs.add(String.format("b %d\n", message.getSeqNb()));
-
-            // TODO remove
-            if (i % 1000 == 0) {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        while (logs.size() < totalNbMessagesInQueue) {
         }
     }
 

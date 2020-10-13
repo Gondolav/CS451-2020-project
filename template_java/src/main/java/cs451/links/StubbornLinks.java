@@ -36,8 +36,10 @@ class StubbornLinks implements Observer, Links {
     @Override
     public void send(Message message, Host host) {
         fairLoss.send(message, host);
-        sent.computeIfAbsent(host, h -> ConcurrentHashMap.newKeySet());
-        sent.get(host).add(message);
+        if (!message.isAck()) {
+            sent.computeIfAbsent(host, h -> ConcurrentHashMap.newKeySet());
+            sent.get(host).add(message);
+        }
     }
 
     @Override
