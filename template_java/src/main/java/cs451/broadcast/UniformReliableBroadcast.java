@@ -5,39 +5,41 @@ import cs451.Message;
 import cs451.Observer;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 class UniformReliableBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final List<Host> hosts;
     private final BestEffortBroadcast beb;
-    private final Set<Message> delivered;
-    private final Set<Pair<Integer, Message>> pending;
-    private final Map<Message, Set<Integer>> ack;
+    private final Set<MessageID> delivered;
+    private final Map<MessageID, Message> pending;
+    private final Map<MessageID, Set<Integer>> ack;
     private final int senderNb;
+    private final ReentrantLock lock = new ReentrantLock();
 
     UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.beb = new BestEffortBroadcast(this, hosts, port, senderNbToHosts, senderNb);
-        this.delivered = ConcurrentHashMap.newKeySet();
-        this.pending = ConcurrentHashMap.newKeySet();
-        this.ack = new ConcurrentHashMap<>();
+        this.delivered = new HashSet<>();
+        this.pending = new HashMap<>();
+        this.ack = new HashMap<>();
         this.senderNb = senderNb;
     }
 
-    private boolean canDeliver(Message message) {
-        return 2 * ack.getOrDefault(message, ConcurrentHashMap.newKeySet()).size() > hosts.size();
+    private boolean canDeliver(MessageID messageID) {
+        return 2 * ack.getOrDefault(messageID, new HashSet<>()).size() > hosts.size();
     }
 
     @Override
     public void broadcast(Message message) {
-        pending.add(new Pair<>(message.getSenderNb(), message));
-        ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
-        ack.get(message).add(message.getSenderNb());
-        ack.get(message).add(senderNb);
-        beb.broadcast(message);
+        lock.lock();
+        var toSend = new Message(message.getSeqNb(), senderNb, senderNb, message.isAck());
+        pending.put(new MessageID(senderNb, message.getSeqNb()), toSend);
+        lock.unlock();
+
+        beb.broadcast(toSend);
     }
 
     @Override
@@ -52,46 +54,25 @@ class UniformReliableBroadcast implements Observer, Broadcast {
 
     @Override
     public void deliver(Message message) {
-        ack.computeIfAbsent(message, m -> ConcurrentHashMap.newKeySet());
-        ack.get(message).add(message.getSenderNb());
-        ack.get(message).add(senderNb);
+        var receivedMessageID = new MessageID(message.getOriginalSenderNb(), message.getSeqNb());
 
-        var pair = new Pair<>(message.getOriginalSenderNb(), message);
-        if (!pending.contains(pair)) {
-            pending.add(pair);
+        lock.lock();
+
+        ack.computeIfAbsent(receivedMessageID, m -> new HashSet<>());
+        ack.get(receivedMessageID).add(message.getSenderNb());
+
+        if (!pending.containsKey(receivedMessageID)) {
+            pending.put(receivedMessageID, message);
             beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), message.isAck()));
         }
 
-        for (var entry : pending) {
-            var msg = entry.second;
-            if (canDeliver(msg) && !delivered.contains(msg)) {
-                delivered.add(msg);
-                observer.deliver(msg);
+        for (var messageID : pending.keySet()) {
+            if (canDeliver(messageID) && !delivered.contains(messageID)) {
+                delivered.add(messageID);
+                observer.deliver(pending.get(messageID));
             }
         }
-    }
 
-    private static class Pair<X, Y> {
-        private final X first;
-        private final Y second;
-
-        private Pair(X first, Y second) {
-            this.first = first;
-            this.second = second;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Pair<?, ?> pair = (Pair<?, ?>) o;
-            return Objects.equals(first, pair.first) &&
-                    Objects.equals(second, pair.second);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(first, second);
-        }
+        lock.unlock();
     }
 }

@@ -4,9 +4,10 @@ import cs451.Host;
 import cs451.Message;
 import cs451.Observer;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PerfectLinks implements Observer, Links {
 
@@ -14,10 +15,12 @@ public class PerfectLinks implements Observer, Links {
     private final StubbornLinks stubborn;
     private final Set<Message> delivered;
 
+    private final ReentrantLock lock = new ReentrantLock();
+
     public PerfectLinks(Observer observer, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
         this.observer = observer;
         this.stubborn = new StubbornLinks(this, port, senderNbToHosts, senderNb);
-        this.delivered = ConcurrentHashMap.newKeySet();
+        this.delivered = new HashSet<>();
     }
 
     @Override
@@ -37,9 +40,11 @@ public class PerfectLinks implements Observer, Links {
 
     @Override
     public void deliver(Message message) {
+        lock.lock();
         if (!delivered.contains(message)) {
             delivered.add(message);
             observer.deliver(message);
         }
+        lock.unlock();
     }
 }

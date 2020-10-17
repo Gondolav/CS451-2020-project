@@ -5,26 +5,28 @@ import cs451.Message;
 import cs451.Observer;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 class StubbornLinks implements Observer, Links {
 
-    private static final int HALF_HALF_SECOND = 250;
+    private static final long HALF_HALF_SECOND = 250;
 
     private final Observer observer;
     private final FairLossLinks fairLoss;
 
-    private final Map<Host, Set<Message>> sent;
+    private final Map<Pair<Host, Integer>, Message> sent;
     private final Timer timer;
 
     private final Map<Integer, Host> senderNbToHosts;
 
     private final int senderNb;
 
+    private final ReentrantLock lock = new ReentrantLock();
+
     StubbornLinks(Observer observer, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
         this.observer = observer;
         this.fairLoss = new FairLossLinks(this, port);
-        this.sent = new ConcurrentHashMap<>();
+        this.sent = new HashMap<>();
 
         this.timer = new Timer();
 
@@ -37,8 +39,10 @@ class StubbornLinks implements Observer, Links {
     public void send(Message message, Host host) {
         fairLoss.send(message, host);
         if (!message.isAck()) {
-            sent.computeIfAbsent(host, h -> ConcurrentHashMap.newKeySet());
-            sent.get(host).add(message);
+            lock.lock();
+            var pair = new Pair<>(host, message.getSeqNb());
+            sent.put(pair, message);
+            lock.unlock();
         }
     }
 
@@ -48,11 +52,11 @@ class StubbornLinks implements Observer, Links {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                lock.lock();
                 for (var entry : sent.entrySet()) {
-                    for (var msg : entry.getValue()) {
-                        fairLoss.send(msg, entry.getKey());
-                    }
+                    fairLoss.send(entry.getValue(), entry.getKey().first);
                 }
+                lock.unlock();
             }
         }, HALF_HALF_SECOND, HALF_HALF_SECOND);
     }
@@ -68,10 +72,36 @@ class StubbornLinks implements Observer, Links {
         var senderHost = senderNbToHosts.get(message.getSenderNb());
 
         if (message.isAck()) {
-            sent.get(senderHost).removeIf(m -> m.getSeqNb() == message.getSeqNb());
+            lock.lock();
+            sent.remove(new Pair<>(senderHost, message.getSeqNb()));
+            lock.unlock();
         } else {
             send(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), true), senderHost);
             observer.deliver(message);
+        }
+    }
+
+    private static class Pair<X, Y> {
+        private final X first;
+        private final Y second;
+
+        private Pair(X first, Y second) {
+            this.first = first;
+            this.second = second;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Pair<?, ?> pair = (Pair<?, ?>) o;
+            return Objects.equals(first, pair.first) &&
+                    Objects.equals(second, pair.second);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(first, second);
         }
     }
 }

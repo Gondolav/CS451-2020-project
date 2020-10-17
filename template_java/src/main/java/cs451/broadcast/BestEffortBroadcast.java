@@ -14,18 +14,23 @@ class BestEffortBroadcast implements Observer, Broadcast {
     private final Observer observer;
     private final List<Host> hosts;
     private final PerfectLinks perfectLinks;
+    private final int senderNb;
 
     BestEffortBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.perfectLinks = new PerfectLinks(this, port, senderNbToHosts, senderNb);
+        this.senderNb = senderNb;
     }
 
     @Override
     public void broadcast(Message message) {
         for (var host : hosts) {
-            perfectLinks.send(message, host);
+            if (host.getId() != senderNb) {
+                perfectLinks.send(message, host);
+            }
         }
+        deliver(message);
     }
 
     @Override

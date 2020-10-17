@@ -4,29 +4,40 @@ import cs451.Host;
 import cs451.Message;
 import cs451.Observer;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 
 class FairLossLinks implements Observer, Links {
 
     private final Observer observer;
     private final UDPReceiver receiver;
-    private final ExecutorService threadPool;
+    private DatagramSocket socket;
 
     FairLossLinks(Observer observer, int port) {
         this.observer = observer;
         this.receiver = new UDPReceiver(this, port);
-        this.threadPool = Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() + 1) * 30);
+        try {
+            socket = new DatagramSocket();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void send(Message message, Host host) {
-        UDPSender udpSender = new UDPSender(host.getIp(), host.getPort(), message);
-        try {
-            threadPool.execute(udpSender);
-        } catch (RejectedExecutionException e) {
-            System.out.println("ThreadPool is shut down");
+        try (var byteOutputStream = new ByteArrayOutputStream();
+             var outputStream = new ObjectOutputStream(byteOutputStream)) {
+            outputStream.writeObject(message);
+            byte[] data = byteOutputStream.toByteArray();
+            var packet = new DatagramPacket(data, data.length, InetAddress.getByName(host.getIp()), host.getPort());
+            socket.send(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -37,7 +48,6 @@ class FairLossLinks implements Observer, Links {
 
     @Override
     public void stop() {
-        threadPool.shutdownNow();
         receiver.stopReceiving();
     }
 
