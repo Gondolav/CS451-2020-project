@@ -1,9 +1,10 @@
 package cs451;
 
-import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Objects;
 
-public class Message implements Serializable {
+public class Message {
 
     private final int seqNb;
     private final byte senderNb; // p in the book
@@ -14,7 +15,22 @@ public class Message implements Serializable {
         this.seqNb = seqNb;
         this.senderNb = senderNb;
         this.originalSenderNb = originalSenderNb;
-        this.isAck = (byte) (isAck ? 1: 0);
+        this.isAck = (byte) (isAck ? 1 : 0);
+    }
+
+    private Message(int seqNb, byte senderNb, byte originalSenderNb, byte isAck) {
+        this.seqNb = seqNb;
+        this.senderNb = senderNb;
+        this.originalSenderNb = originalSenderNb;
+        this.isAck = isAck;
+    }
+
+    public static Message fromByteArray(byte[] array) {
+        int seqNb = ByteBuffer.wrap(array).order(ByteOrder.LITTLE_ENDIAN).getInt();
+        byte senderNb = array[4];
+        byte originalSenderNb = array[5];
+        byte isAck = array[6];
+        return new Message(seqNb, senderNb, originalSenderNb, isAck);
     }
 
     public int getSeqNb() {
@@ -31,6 +47,16 @@ public class Message implements Serializable {
 
     public boolean isAck() {
         return isAck == 1;
+    }
+
+    public byte[] toByteArray() {
+        byte[] seqNbArray = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(seqNb).array();
+        byte[] result = new byte[7];
+        System.arraycopy(seqNbArray, 0, result, 0, seqNbArray.length);
+        result[4] = senderNb;
+        result[5] = originalSenderNb;
+        result[6] = isAck;
+        return result;
     }
 
     @Override

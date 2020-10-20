@@ -3,10 +3,7 @@ package cs451.links;
 import cs451.Message;
 import cs451.Observer;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -18,8 +15,8 @@ class UDPReceiver extends Thread {
     private final Observer observer;
     private final byte[] buf = new byte[65535];
     private final AtomicBoolean running = new AtomicBoolean(false);
-    private DatagramSocket socket;
     private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+    private DatagramSocket socket;
 
     UDPReceiver(Observer observer, int port) {
         this.observer = observer;
@@ -47,12 +44,9 @@ class UDPReceiver extends Thread {
                 e.printStackTrace();
             }
 
-            try (var inputStream = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(packet.getData())))) {
-                Message message = (Message) inputStream.readObject();
-                threadPool.execute(() -> observer.deliver(message));
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+            Message message = Message.fromByteArray(packet.getData());
+            threadPool.execute(() -> observer.deliver(message));
+//            observer.deliver(message);
         }
     }
 }
