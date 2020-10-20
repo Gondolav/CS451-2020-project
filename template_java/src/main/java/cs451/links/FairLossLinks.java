@@ -17,6 +17,7 @@ class FairLossLinks implements Observer, Links {
 
     private final Observer observer;
     private final UDPReceiver receiver;
+
     private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 //        private DatagramSocket socket;
     private DatagramSocket[] senderSockets;

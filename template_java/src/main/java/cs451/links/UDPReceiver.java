@@ -15,6 +15,7 @@ class UDPReceiver extends Thread {
     private final Observer observer;
     private final byte[] buf = new byte[65535];
     private final AtomicBoolean running = new AtomicBoolean(false);
+
     private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
     private DatagramSocket socket;
 
