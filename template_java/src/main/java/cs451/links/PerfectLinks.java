@@ -17,7 +17,7 @@ public class PerfectLinks implements Observer, Links {
 
     private final ReentrantLock lock = new ReentrantLock();
 
-    public PerfectLinks(Observer observer, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
+    public PerfectLinks(Observer observer, int port, Map<Byte, Host> senderNbToHosts, byte senderNb) {
         this.observer = observer;
         this.stubborn = new StubbornLinks(this, port, senderNbToHosts, senderNb);
         this.delivered = new HashSet<>();

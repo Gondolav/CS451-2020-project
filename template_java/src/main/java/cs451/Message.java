@@ -6,31 +6,31 @@ import java.util.Objects;
 public class Message implements Serializable {
 
     private final int seqNb;
-    private final int senderNb; // p in the book
-    private final int originalSenderNb; // s in the book
-    private final boolean isAck;
+    private final byte senderNb; // p in the book
+    private final byte originalSenderNb; // s in the book
+    private final byte isAck;
 
-    public Message(int seqNb, int senderNb, int originalSenderNb, boolean isAck) {
+    public Message(int seqNb, byte senderNb, byte originalSenderNb, boolean isAck) {
         this.seqNb = seqNb;
         this.senderNb = senderNb;
         this.originalSenderNb = originalSenderNb;
-        this.isAck = isAck;
+        this.isAck = (byte) (isAck ? 1: 0);
     }
 
     public int getSeqNb() {
         return seqNb;
     }
 
-    public int getSenderNb() {
+    public byte getSenderNb() {
         return senderNb;
     }
 
-    public int getOriginalSenderNb() {
+    public byte getOriginalSenderNb() {
         return originalSenderNb;
     }
 
     public boolean isAck() {
-        return isAck;
+        return isAck == 1;
     }
 
     @Override

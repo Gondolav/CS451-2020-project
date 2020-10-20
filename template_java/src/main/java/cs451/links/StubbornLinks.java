@@ -17,13 +17,13 @@ class StubbornLinks implements Observer, Links {
     private final Map<Pair<Host, Integer>, Message> sent;
     private final Timer timer;
 
-    private final Map<Integer, Host> senderNbToHosts;
+    private final Map<Byte, Host> senderNbToHosts;
 
-    private final int senderNb;
+    private final byte senderNb;
 
     private final ReentrantLock lock = new ReentrantLock();
 
-    StubbornLinks(Observer observer, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
+    StubbornLinks(Observer observer, int port, Map<Byte, Host> senderNbToHosts, byte senderNb) {
         this.observer = observer;
         this.fairLoss = new FairLossLinks(this, port);
         this.sent = new HashMap<>();

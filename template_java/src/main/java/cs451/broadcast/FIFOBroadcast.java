@@ -17,11 +17,11 @@ public class FIFOBroadcast implements Observer, Broadcast {
     private final UniformReliableBroadcast urb;
     private final Map<MessageID, Message> pending;
     private final AtomicIntegerArray next;
-    private final int senderNb;
+    private final byte senderNb;
     private final ReentrantLock lock = new ReentrantLock();
     private int lsn; // sequence number for broadcasting
 
-    public FIFOBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
+    public FIFOBroadcast(Observer observer, List<Host> hosts, int port, Map<Byte, Host> senderNbToHosts, byte senderNb) {
         this.observer = observer;
         this.urb = new UniformReliableBroadcast(this, hosts, port, senderNbToHosts, senderNb);
         this.lsn = 1;

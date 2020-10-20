@@ -14,11 +14,11 @@ class UniformReliableBroadcast implements Observer, Broadcast {
     private final BestEffortBroadcast beb;
     private final Set<MessageID> delivered;
     private final Map<MessageID, Message> pending;
-    private final Map<MessageID, Set<Integer>> ack;
-    private final int senderNb;
+    private final Map<MessageID, Set<Byte>> ack;
+    private final byte senderNb;
     private final ReentrantLock lock = new ReentrantLock();
 
-    UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
+    UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, Map<Byte, Host> senderNbToHosts, byte senderNb) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.beb = new BestEffortBroadcast(this, hosts, port, senderNbToHosts, senderNb);

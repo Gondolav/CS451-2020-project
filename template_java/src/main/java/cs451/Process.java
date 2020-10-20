@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Process implements Observer {
 
-    private final int id;
+    private final byte id;
 
     private final int nbMessagesToBroadcast;
 
@@ -23,17 +23,17 @@ public class Process implements Observer {
     private final Broadcast broadcast;
 
     public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output) {
-        this.id = id;
+        this.id = (byte) id;
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
         this.output = output;
         this.logs = new ConcurrentLinkedQueue<>();
 
-        Map<Integer, Host> senderNbToHosts = new HashMap<>();
+        Map<Byte, Host> senderNbToHosts = new HashMap<>();
         for (var host : hosts) {
-            senderNbToHosts.put(host.getId(), host);
+            senderNbToHosts.put((byte) host.getId(), host);
         }
 
-        this.broadcast = new FIFOBroadcast(this, hosts, port, senderNbToHosts, id);
+        this.broadcast = new FIFOBroadcast(this, hosts, port, senderNbToHosts, this.id);
     }
 
     public void startBroadcasting() {

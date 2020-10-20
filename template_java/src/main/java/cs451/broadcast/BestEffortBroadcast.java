@@ -16,7 +16,7 @@ class BestEffortBroadcast implements Observer, Broadcast {
     private final PerfectLinks perfectLinks;
     private final int senderNb;
 
-    BestEffortBroadcast(Observer observer, List<Host> hosts, int port, Map<Integer, Host> senderNbToHosts, int senderNb) {
+    BestEffortBroadcast(Observer observer, List<Host> hosts, int port, Map<Byte, Host> senderNbToHosts, byte senderNb) {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.perfectLinks = new PerfectLinks(this, port, senderNbToHosts, senderNb);
