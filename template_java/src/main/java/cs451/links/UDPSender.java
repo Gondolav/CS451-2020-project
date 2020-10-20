@@ -5,24 +5,27 @@ import cs451.Message;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 class UDPSender implements Runnable {
-    private DatagramSocket socket;
+    private final DatagramSocket socket;
 
     private InetAddress ip;
-    private int port;
-    private Message message;
+    private final int port;
+    private final Message message;
 
-    UDPSender(String ip, int port, Message message) {
+    UDPSender(String ip, int port, Message message, DatagramSocket socket) {
         try {
             this.ip = InetAddress.getByName(ip);
-            this.port = port;
-            this.message = message;
-            socket = new DatagramSocket();
-        } catch (SocketException | UnknownHostException e) {
+        } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+        this.port = port;
+        this.message = message;
+        this.socket = socket;
     }
 
     @Override

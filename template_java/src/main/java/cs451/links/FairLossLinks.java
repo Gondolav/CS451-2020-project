@@ -4,25 +4,26 @@ import cs451.Host;
 import cs451.Message;
 import cs451.Observer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
 
 class FairLossLinks implements Observer, Links {
 
     private final Observer observer;
     private final UDPReceiver receiver;
-    private DatagramSocket socket;
+    private DatagramSocket[] senderSockets;
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 
     FairLossLinks(Observer observer, int port) {
         this.observer = observer;
         this.receiver = new UDPReceiver(this, port);
         try {
-            socket = new DatagramSocket();
+            senderSockets = new DatagramSocket[]{new DatagramSocket(), new DatagramSocket(), new DatagramSocket(),
+                    new DatagramSocket(), new DatagramSocket(), new DatagramSocket(), new DatagramSocket(),
+                    new DatagramSocket(), new DatagramSocket(), new DatagramSocket()};
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -30,15 +31,9 @@ class FairLossLinks implements Observer, Links {
 
     @Override
     public void send(Message message, Host host) {
-        try (var byteOutputStream = new ByteArrayOutputStream();
-             var outputStream = new ObjectOutputStream(byteOutputStream)) {
-            outputStream.writeObject(message);
-            byte[] data = byteOutputStream.toByteArray();
-            var packet = new DatagramPacket(data, data.length, InetAddress.getByName(host.getIp()), host.getPort());
-            socket.send(packet);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        int socketSelector = ThreadLocalRandom.current().nextInt(0, senderSockets.length);
+        UDPSender sender = new UDPSender(host.getIp(), host.getPort(), message, senderSockets[socketSelector]);
+        threadPool.execute(sender);
     }
 
     @Override

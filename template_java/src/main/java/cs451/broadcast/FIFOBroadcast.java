@@ -36,7 +36,6 @@ public class FIFOBroadcast implements Observer, Broadcast {
 
     @Override
     public void broadcast(Message message) {
-        // TODO need to use lock here if using multiple threads
         urb.broadcast(new Message(lsn++, senderNb, message.getOriginalSenderNb(), message.isAck()));
     }
 

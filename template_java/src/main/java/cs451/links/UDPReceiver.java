@@ -10,6 +10,8 @@ import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 class UDPReceiver extends Thread {
@@ -17,6 +19,7 @@ class UDPReceiver extends Thread {
     private final byte[] buf = new byte[65535];
     private final AtomicBoolean running = new AtomicBoolean(false);
     private DatagramSocket socket;
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 
     UDPReceiver(Observer observer, int port) {
         this.observer = observer;
@@ -46,7 +49,7 @@ class UDPReceiver extends Thread {
 
             try (var inputStream = new ObjectInputStream(new BufferedInputStream(new ByteArrayInputStream(packet.getData())))) {
                 Message message = (Message) inputStream.readObject();
-                observer.deliver(message);
+                threadPool.execute(() -> observer.deliver(message));
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
