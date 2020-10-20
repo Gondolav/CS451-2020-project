@@ -58,7 +58,7 @@ public class FIFOBroadcast implements Observer, Broadcast {
         var iterator = pending.entrySet().iterator();
         while (iterator.hasNext()) {
             var entry = iterator.next();
-            var senderNb = entry.getKey().senderID;
+            var senderNb = entry.getKey().senderNb;
             var msg = entry.getValue();
             if (msg.getSeqNb() == next.get(senderNb)) {
                 next.incrementAndGet(senderNb);

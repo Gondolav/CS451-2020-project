@@ -37,13 +37,13 @@ class StubbornLinks implements Observer, Links {
 
     @Override
     public void send(Message message, Host host) {
-        fairLoss.send(message, host);
         if (!message.isAck()) {
             lock.lock();
             var pair = new Pair<>(host, message.getSeqNb());
             sent.put(pair, message);
             lock.unlock();
         }
+        fairLoss.send(message, host);
     }
 
     @Override

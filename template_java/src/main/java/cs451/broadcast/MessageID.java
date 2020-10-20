@@ -3,12 +3,12 @@ package cs451.broadcast;
 import java.util.Objects;
 
 class MessageID {
-    final int senderID;
-    final long messageID;
+    final byte senderNb;
+    final int messageNb;
 
-    MessageID(int senderID, long messageID) {
-        this.senderID = senderID;
-        this.messageID = messageID;
+    MessageID(byte senderNb, int messageNb) {
+        this.senderNb = senderNb;
+        this.messageNb = messageNb;
     }
 
     @Override
@@ -16,20 +16,20 @@ class MessageID {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MessageID that = (MessageID) o;
-        return senderID == that.senderID &&
-                messageID == that.messageID;
+        return senderNb == that.senderNb &&
+                messageNb == that.messageNb;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(senderID, messageID);
+        return Objects.hash(senderNb, messageNb);
     }
 
     @Override
     public String toString() {
         return "MessageID{" +
-                "senderID=" + senderID +
-                ", messageID=" + messageID +
+                "senderID=" + senderNb +
+                ", messageID=" + messageNb +
                 '}';
     }
 }
