@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -19,12 +20,12 @@ public class FIFOBroadcast implements Observer, Broadcast {
     private final AtomicIntegerArray next;
     private final byte senderNb;
     private final ReentrantLock lock = new ReentrantLock();
-    private int lsn; // sequence number for broadcasting
+    private final AtomicInteger lsn; // sequence number for broadcasting
 
     public FIFOBroadcast(Observer observer, List<Host> hosts, int port, Map<Byte, Host> senderNbToHosts, byte senderNb) {
         this.observer = observer;
         this.urb = new UniformReliableBroadcast(this, hosts, port, senderNbToHosts, senderNb);
-        this.lsn = 1;
+        this.lsn = new AtomicInteger(1);
         this.pending = new HashMap<>();
 
         int[] nextTmp = new int[hosts.size() + 1];
@@ -36,7 +37,7 @@ public class FIFOBroadcast implements Observer, Broadcast {
 
     @Override
     public void broadcast(Message message) {
-        urb.broadcast(new Message(lsn++, senderNb, message.getOriginalSenderNb(), message.isAck()));
+        urb.broadcast(new Message(lsn.getAndIncrement(), senderNb, message.getOriginalSenderNb(), message.isAck()));
     }
 
     @Override

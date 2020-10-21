@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 class StubbornLinks implements Observer, Links {
 
-    private static final long HALF_HALF_SECOND = 250;
+    private static final long TIMEOUT = 200;
 
     private final Observer observer;
     private final FairLossLinks fairLoss;
@@ -58,7 +58,7 @@ class StubbornLinks implements Observer, Links {
                 }
                 lock.unlock();
             }
-        }, HALF_HALF_SECOND, HALF_HALF_SECOND);
+        }, TIMEOUT, TIMEOUT);
     }
 
     @Override

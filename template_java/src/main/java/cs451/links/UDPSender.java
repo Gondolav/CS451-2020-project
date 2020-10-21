@@ -28,7 +28,7 @@ class UDPSender implements Runnable {
     @Override
     public void run() {
         byte[] data = message.toByteArray();
-        System.out.println(data.length);
+        System.out.println(data.length); //faster with it
         var packet = new DatagramPacket(data, data.length, ip, port);
         try {
             socket.send(packet);
