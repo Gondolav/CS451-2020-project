@@ -54,15 +54,15 @@ public class FIFOBroadcast implements Observer, Broadcast {
     public void deliver(Message message) {
         lock.lock();
 
-        pending.put(new MessageID(message.getSenderNb(), message.getSeqNb()), message);
+        pending.put(new MessageID(message.getOriginalSenderNb(), message.getSeqNb()), message);
 
         var iterator = pending.entrySet().iterator();
         while (iterator.hasNext()) {
             var entry = iterator.next();
-            var senderNb = entry.getKey().senderNb;
             var msg = entry.getValue();
-            if (msg.getSeqNb() == next.get(senderNb)) {
-                next.incrementAndGet(senderNb);
+            var originalSenderNb = msg.getOriginalSenderNb();
+            if (msg.getSeqNb() == next.get(originalSenderNb)) {
+                next.incrementAndGet(originalSenderNb);
                 iterator.remove();
                 observer.deliver(msg);
             }
