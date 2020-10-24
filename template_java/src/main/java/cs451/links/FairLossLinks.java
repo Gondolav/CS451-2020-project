@@ -18,18 +18,18 @@ class FairLossLinks implements Observer, Links {
     private final Observer observer;
     private final UDPReceiver receiver;
 
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
-//        private DatagramSocket socket;
-    private DatagramSocket[] senderSockets;
+//    private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+        private DatagramSocket socket;
+//    private DatagramSocket[] senderSockets;
 
     FairLossLinks(Observer observer, int port) {
         this.observer = observer;
         this.receiver = new UDPReceiver(this, port);
         try {
-//            socket = new DatagramSocket();
-            senderSockets = new DatagramSocket[]{new DatagramSocket(), new DatagramSocket(), new DatagramSocket(),
-                    new DatagramSocket(), new DatagramSocket(), new DatagramSocket(), new DatagramSocket(),
-                    new DatagramSocket(), new DatagramSocket(), new DatagramSocket()};
+            socket = new DatagramSocket();
+//            senderSockets = new DatagramSocket[]{new DatagramSocket(), new DatagramSocket(), new DatagramSocket(),
+//                    new DatagramSocket(), new DatagramSocket(), new DatagramSocket(), new DatagramSocket(),
+//                    new DatagramSocket(), new DatagramSocket(), new DatagramSocket()};
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -37,16 +37,16 @@ class FairLossLinks implements Observer, Links {
 
     @Override
     public void send(Message message, Host host) {
-        int socketSelector = ThreadLocalRandom.current().nextInt(0, senderSockets.length);
-        UDPSender sender = new UDPSender(host.getIp(), host.getPort(), message, senderSockets[socketSelector]);
-        threadPool.execute(sender);
-//        try {
-//            byte[] data = message.toByteArray();
-//            DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(host.getIp()), host.getPort());
-//            socket.send(packet);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+//        int socketSelector = ThreadLocalRandom.current().nextInt(0, senderSockets.length);
+//        UDPSender sender = new UDPSender(host.getIp(), host.getPort(), message, senderSockets[socketSelector]);
+//        threadPool.execute(sender);
+        try {
+            byte[] data = message.toByteArray();
+            DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(host.getIp()), host.getPort());
+            socket.send(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
