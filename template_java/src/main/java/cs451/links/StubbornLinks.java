@@ -53,10 +53,10 @@ class StubbornLinks implements Observer, Links {
             @Override
             public void run() {
                 lock.lock();
-                for (var entry : sent.entrySet()) {
-                    fairLoss.send(entry.getValue(), entry.getKey().first);
-                }
+                var toSend = new HashMap<>(sent);
                 lock.unlock();
+                toSend.entrySet().stream().sorted(Comparator.comparing(o -> o.getKey().second))
+                        .forEach(entry -> fairLoss.send(entry.getValue(), entry.getKey().first));
             }
         }, TIMEOUT, TIMEOUT);
     }

@@ -66,10 +66,14 @@ class UniformReliableBroadcast implements Observer, Broadcast {
             beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), message.isAck()));
         }
 
-        for (var messageID : pending.keySet()) {
+        var iterator = pending.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var entry = iterator.next();
+            var messageID = entry.getKey();
             if (canDeliver(messageID) && !delivered.contains(messageID)) {
                 delivered.add(messageID);
-                observer.deliver(pending.get(messageID));
+                observer.deliver(entry.getValue());
+                iterator.remove();
             }
         }
 

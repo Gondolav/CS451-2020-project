@@ -25,11 +25,11 @@ class BestEffortBroadcast implements Observer, Broadcast {
 
     @Override
     public void broadcast(Message message) {
-        for (var host : hosts) {
+        hosts.parallelStream().forEach(host -> {
             if (host.getId() != senderNb) {
                 perfectLinks.send(message, host);
             }
-        }
+        });
         deliver(message);
     }
 

@@ -16,7 +16,7 @@ class UDPReceiver extends Thread {
     private final byte[] buf = new byte[65535];
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-//    private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
     private DatagramSocket socket;
 
     UDPReceiver(Observer observer, int port) {
@@ -46,8 +46,8 @@ class UDPReceiver extends Thread {
             }
 
             Message message = Message.fromByteArray(packet.getData());
-//            threadPool.execute(() -> observer.deliver(message));
-            observer.deliver(message);
+            threadPool.execute(() -> observer.deliver(message));
+//            observer.deliver(message);
         }
     }
 }
