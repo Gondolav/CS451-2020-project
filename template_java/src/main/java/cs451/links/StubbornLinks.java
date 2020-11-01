@@ -76,7 +76,7 @@ class StubbornLinks implements Observer, Links {
             sent.remove(new Pair<>(senderHost, message.getSeqNb()));
             lock.unlock();
         } else {
-            send(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), true), senderHost);
+            send(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), true, false), senderHost);
             observer.deliver(message);
         }
     }

@@ -36,7 +36,7 @@ public class FIFOBroadcast implements Observer, Broadcast {
 
     @Override
     public void broadcast(Message message) {
-        urb.broadcast(new Message(lsn, senderNb, message.getOriginalSenderNb(), message.isAck()));
+        urb.broadcast(new Message(lsn, senderNb, message.getOriginalSenderNb(), message.isAck(), message.isUpperLimit()));
         lock.lock();
         lsn++;
         lock.unlock();
@@ -58,6 +58,17 @@ public class FIFOBroadcast implements Observer, Broadcast {
 
         lock.lock();
 
+        if (message.isUpperLimit()) {
+            var nextSeqNb = next.get(messageID.senderNb);
+            if (messageID.messageNb > nextSeqNb) {
+                for (int i = nextSeqNb; i < messageID.messageNb + 1; i++) {
+                    var msg = new Message(i, message.getSenderNb(), message.getOriginalSenderNb(), message.isAck(), message.isUpperLimit());
+                    observer.deliver(msg);
+                }
+                next.set(messageID.senderNb, messageID.messageNb + 1);
+            }
+        }
+
         if (messageID.messageNb >= next.get(messageID.senderNb)) {
             pending.put(messageID, message);
 
@@ -69,6 +80,7 @@ public class FIFOBroadcast implements Observer, Broadcast {
                 if (msg.getSeqNb() == next.get(originalSenderNb)) {
                     observer.deliver(msg);
                     next.incrementAndGet(originalSenderNb);
+                    urb.broadcast(new Message(message.getSeqNb(), message.getSenderNb(), message.getOriginalSenderNb(), message.isAck(), true));
                     iterator.remove();
                 }
             }

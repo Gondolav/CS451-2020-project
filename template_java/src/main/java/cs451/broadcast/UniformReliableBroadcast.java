@@ -35,7 +35,7 @@ class UniformReliableBroadcast implements Observer, Broadcast {
     @Override
     public void broadcast(Message message) {
         lock.lock();
-        var toSend = new Message(message.getSeqNb(), senderNb, senderNb, message.isAck());
+        var toSend = new Message(message.getSeqNb(), senderNb, senderNb, message.isAck(), message.isUpperLimit());
         pending.put(new MessageID(senderNb, message.getSeqNb()), toSend);
         lock.unlock();
 
@@ -63,17 +63,14 @@ class UniformReliableBroadcast implements Observer, Broadcast {
 
         if (!pending.containsKey(receivedMessageID)) {
             pending.put(receivedMessageID, message);
-            beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), message.isAck()));
+            beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), message.isAck(), message.isUpperLimit()));
         }
 
-        var iterator = pending.entrySet().iterator();
-        while (iterator.hasNext()) {
-            var entry = iterator.next();
+        for (var entry : pending.entrySet()) {
             var messageID = entry.getKey();
             if (canDeliver(messageID) && !delivered.contains(messageID)) {
                 delivered.add(messageID);
                 observer.deliver(entry.getValue());
-                iterator.remove();
             }
         }
 

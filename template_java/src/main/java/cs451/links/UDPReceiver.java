@@ -47,7 +47,6 @@ class UDPReceiver extends Thread {
 
             Message message = Message.fromByteArray(packet.getData());
             threadPool.execute(() -> observer.deliver(message));
-//            observer.deliver(message);
         }
     }
 }
