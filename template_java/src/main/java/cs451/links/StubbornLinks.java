@@ -1,11 +1,11 @@
 package cs451.links;
 
 import cs451.Host;
-import cs451.Message;
-import cs451.Observer;
+import cs451.utils.Message;
+import cs451.utils.Observer;
 
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ConcurrentHashMap;
 
 class StubbornLinks implements Observer, Links {
 
@@ -21,12 +21,10 @@ class StubbornLinks implements Observer, Links {
 
     private final byte senderNb;
 
-    private final ReentrantLock lock = new ReentrantLock();
-
     StubbornLinks(Observer observer, int port, Map<Byte, Host> senderNbToHosts, byte senderNb) {
         this.observer = observer;
         this.fairLoss = new FairLossLinks(this, port);
-        this.sent = new HashMap<>();
+        this.sent = new ConcurrentHashMap<>();
 
         this.timer = new Timer();
 
@@ -38,10 +36,8 @@ class StubbornLinks implements Observer, Links {
     @Override
     public void send(Message message, Host host) {
         if (!message.isAck()) {
-            lock.lock();
             var pair = new Pair<>(host, message.getSeqNb());
             sent.put(pair, message);
-            lock.unlock();
         }
         fairLoss.send(message, host);
     }
@@ -52,9 +48,7 @@ class StubbornLinks implements Observer, Links {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                lock.lock();
                 var toSend = new HashMap<>(sent);
-                lock.unlock();
                 toSend.entrySet().stream().sorted(Comparator.comparing(o -> o.getKey().second))
                         .forEach(entry -> fairLoss.send(entry.getValue(), entry.getKey().first));
             }
@@ -72,11 +66,9 @@ class StubbornLinks implements Observer, Links {
         var senderHost = senderNbToHosts.get(message.getSenderNb());
 
         if (message.isAck()) {
-            lock.lock();
             sent.remove(new Pair<>(senderHost, message.getSeqNb()));
-            lock.unlock();
         } else {
-            send(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), true, false), senderHost);
+            send(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), true), senderHost);
             observer.deliver(message);
         }
     }

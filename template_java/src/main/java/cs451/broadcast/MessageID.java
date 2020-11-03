@@ -28,8 +28,8 @@ class MessageID {
     @Override
     public String toString() {
         return "MessageID{" +
-                "senderID=" + senderNb +
-                ", messageID=" + messageNb +
+                "senderNb=" + senderNb +
+                ", messageNb=" + messageNb +
                 '}';
     }
 }
