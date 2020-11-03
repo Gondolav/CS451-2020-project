@@ -1,6 +1,6 @@
 package cs451.links;
 
-import cs451.Message;
+import cs451.utils.Message;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

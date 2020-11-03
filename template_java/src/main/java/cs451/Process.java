@@ -2,6 +2,8 @@ package cs451;
 
 import cs451.broadcast.Broadcast;
 import cs451.broadcast.FIFOBroadcast;
+import cs451.utils.Message;
+import cs451.utils.Observer;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,7 +42,7 @@ public class Process implements Observer {
         broadcast.start();
 
         for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
-            var message = new Message(i, id, id, false, false);
+            var message = new Message(i, id, id, false);
 
             broadcast.broadcast(message);
 

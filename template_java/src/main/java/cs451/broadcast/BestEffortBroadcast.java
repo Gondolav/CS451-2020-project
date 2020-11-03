@@ -1,8 +1,8 @@
 package cs451.broadcast;
 
 import cs451.Host;
-import cs451.Message;
-import cs451.Observer;
+import cs451.utils.Message;
+import cs451.utils.Observer;
 import cs451.links.PerfectLinks;
 
 import java.util.ArrayList;

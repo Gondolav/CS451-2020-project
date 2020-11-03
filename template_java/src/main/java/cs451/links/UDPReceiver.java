@@ -1,7 +1,7 @@
 package cs451.links;
 
-import cs451.Message;
-import cs451.Observer;
+import cs451.utils.Message;
+import cs451.utils.Observer;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

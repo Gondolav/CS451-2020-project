@@ -1,8 +1,8 @@
 package cs451.broadcast;
 
 import cs451.Host;
-import cs451.Message;
-import cs451.Observer;
+import cs451.utils.Message;
+import cs451.utils.Observer;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -35,7 +35,7 @@ class UniformReliableBroadcast implements Observer, Broadcast {
     @Override
     public void broadcast(Message message) {
         lock.lock();
-        var toSend = new Message(message.getSeqNb(), senderNb, senderNb, message.isAck(), message.isUpperLimit());
+        var toSend = new Message(message.getSeqNb(), senderNb, senderNb, message.isAck());
         pending.put(new MessageID(senderNb, message.getSeqNb()), toSend);
         lock.unlock();
 
@@ -63,7 +63,7 @@ class UniformReliableBroadcast implements Observer, Broadcast {
 
         if (!pending.containsKey(receivedMessageID)) {
             pending.put(receivedMessageID, message);
-            beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), message.isAck(), message.isUpperLimit()));
+            beb.broadcast(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), message.isAck()));
         }
 
         for (var entry : pending.entrySet()) {

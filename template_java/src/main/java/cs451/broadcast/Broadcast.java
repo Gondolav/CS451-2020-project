@@ -1,6 +1,6 @@
 package cs451.broadcast;
 
-import cs451.Message;
+import cs451.utils.Message;
 
 public interface Broadcast {
 
