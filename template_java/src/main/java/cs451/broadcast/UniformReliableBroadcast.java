@@ -16,6 +16,7 @@ class UniformReliableBroadcast implements Observer, Broadcast {
     private final Map<MessageID, Message> pending;
     private final Map<MessageID, Set<Byte>> ack;
     private final byte senderNb;
+
     private final ReentrantLock lock = new ReentrantLock();
 
     UniformReliableBroadcast(Observer observer, List<Host> hosts, int port, Map<Byte, Host> senderNbToHosts, byte senderNb) {
@@ -58,8 +59,7 @@ class UniformReliableBroadcast implements Observer, Broadcast {
 
         lock.lock();
 
-        ack.computeIfAbsent(receivedMessageID, m -> new HashSet<>());
-        ack.get(receivedMessageID).add(message.getSenderNb());
+        ack.computeIfAbsent(receivedMessageID, m -> new HashSet<>()).add(message.getSenderNb());
 
         if (!pending.containsKey(receivedMessageID)) {
             pending.put(receivedMessageID, message);

@@ -9,12 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class StubbornLinks implements Observer, Links {
 
-    private static final long TIMEOUT = 200;
+    private static final long TIMEOUT = 200L;
 
     private final Observer observer;
     private final FairLossLinks fairLoss;
 
     private final Map<Pair<Host, Integer>, Message> sent;
+
     private final Timer timer;
 
     private final Map<Byte, Host> senderNbToHosts;

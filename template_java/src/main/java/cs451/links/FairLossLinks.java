@@ -35,7 +35,7 @@ class FairLossLinks implements Observer, Links {
 
     @Override
     public void send(Message message, Host host) {
-        int socketSelector = ThreadLocalRandom.current().nextInt(0, senderSockets.length);
+        int socketSelector = ThreadLocalRandom.current().nextInt(senderSockets.length);
         UDPSender sender = new UDPSender(host.getIp(), host.getPort(), message, senderSockets[socketSelector]);
         threadPool.execute(sender);
     }
