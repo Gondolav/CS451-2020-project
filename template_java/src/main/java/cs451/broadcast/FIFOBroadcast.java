@@ -35,7 +35,7 @@ public class FIFOBroadcast implements Observer, Broadcast {
 
     @Override
     public void broadcast(Message message) {
-        urb.broadcast(new Message(lsn.getAndIncrement(), senderNb, message.getOriginalSenderNb(), message.isAck()));
+        urb.broadcast(new Message(lsn.getAndIncrement(), senderNb, message.getOriginalSenderNb(), message.isAck(), message.getVectorClock()));
     }
 
     @Override

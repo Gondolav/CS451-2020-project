@@ -69,7 +69,7 @@ class StubbornLinks implements Observer, Links {
         if (message.isAck()) {
             sent.remove(new Pair<>(senderHost, message.getSeqNb()));
         } else {
-            send(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), true), senderHost);
+            send(new Message(message.getSeqNb(), senderNb, message.getOriginalSenderNb(), true, message.getVectorClock()), senderHost);
             observer.deliver(message);
         }
     }

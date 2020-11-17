@@ -2,14 +2,13 @@ package cs451;
 
 import cs451.broadcast.Broadcast;
 import cs451.broadcast.FIFOBroadcast;
+import cs451.broadcast.LCBroadcast;
 import cs451.utils.Message;
 import cs451.utils.Observer;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Process implements Observer {
@@ -38,11 +37,25 @@ public class Process implements Observer {
         this.broadcast = new FIFOBroadcast(this, hosts, port, senderNbToHosts, this.id);
     }
 
+    public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output, Set<Byte> locality) {
+        this.id = (byte) id;
+        this.nbMessagesToBroadcast = nbMessagesToBroadcast;
+        this.output = output;
+        this.logs = new ConcurrentLinkedQueue<>();
+
+        Map<Byte, Host> senderNbToHosts = new HashMap<>();
+        for (var host : hosts) {
+            senderNbToHosts.put((byte) host.getId(), host);
+        }
+
+        this.broadcast = new LCBroadcast(this, hosts, port, senderNbToHosts, this.id, new HashSet<>(locality), (byte) (this.id - 1));
+    }
+
     public void startBroadcasting() {
         broadcast.start();
 
         for (int i = 1; i < nbMessagesToBroadcast + 1; i++) {
-            var message = new Message(i, id, id, false);
+            var message = new Message(i, id, id, false, null);
 
             broadcast.broadcast(message);
 

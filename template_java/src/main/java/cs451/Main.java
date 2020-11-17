@@ -5,7 +5,9 @@ import cs451.parser.Parser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,11 +61,33 @@ public class Main {
             }
         }
 
-        int nbMessagesToBroadcast = configLines != null ? Integer.parseInt(configLines.get(0)) : 0;
+        int nbMessagesToBroadcast = 0;
+        Set<Byte> locality = null;
+        if (configLines != null) {
+            nbMessagesToBroadcast = Integer.parseInt(configLines.get(0));
+            int size = configLines.size();
+            if (size > 1) {
+                for (String line : configLines.subList(1, size)) {
+                    var split = line.split(" ");
+                    if (Integer.parseInt(split[0]) == parser.myId()) {
+                        locality = Arrays.stream(split).skip(1).map(Byte::valueOf).collect(Collectors.toUnmodifiableSet());
+                        break;
+                    }
+                }
+            }
+        }
+
         // Go through each host, find the one associated to our id, create new process and new list of hosts
         for (var host : parser.hosts()) {
             if (host.getId() == parser.myId()) {
-                pr = new Process(host.getId(), host.getPort(), nbMessagesToBroadcast, parser.hosts(), parser.output());
+                if (locality != null) {
+                    System.out.println(locality.toString());
+                    // LCBroadcast
+                    pr = new Process(host.getId(), host.getPort(), nbMessagesToBroadcast, parser.hosts(), parser.output(), locality);
+                } else {
+                    // FIFO
+                    pr = new Process(host.getId(), host.getPort(), nbMessagesToBroadcast, parser.hosts(), parser.output());
+                }
                 break;
             }
         }
