@@ -2,7 +2,6 @@ package cs451.utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -38,7 +37,7 @@ public class Message {
         byte vectorClockSize = array[7];
 
         if (vectorClockSize > 0) {
-            ByteBuffer vectorClockBuffer = ByteBuffer.wrap(array, 8, vectorClockSize);
+            ByteBuffer vectorClockBuffer = ByteBuffer.wrap(array, 8, vectorClockSize).order(ByteOrder.LITTLE_ENDIAN);
             int[] vectorClock = new int[(int) Math.ceil(vectorClockSize / 4.0)];
             for (int i = 0; i < vectorClock.length; i++) {
                 vectorClock[i] = vectorClockBuffer.getInt();
@@ -89,7 +88,7 @@ public class Message {
             System.arraycopy(result, 0, newResult, 0, result.length);
             newResult[7] = (byte) vectorClockSize;
 
-            var bufferArray = buffer.array();
+            byte[] bufferArray = buffer.array();
             System.arraycopy(bufferArray, 0, newResult, 8, bufferArray.length);
 
             return newResult;

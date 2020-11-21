@@ -63,20 +63,29 @@ public class LCBroadcast implements Observer, Broadcast {
         receiveLock.lock();
         pending.computeIfAbsent(message.getOriginalSenderNb(), s -> new HashSet<>()).add(message);
 
-        // For every process
-        for (byte p = 1; p < vClockSend.length + 1; p++) {
-            for (var msg : pending.get(p)) {
-                byte originalSenderNb = msg.getOriginalSenderNb();
-                if (smallerOrEqual(msg.getVectorClock(), vClockReceive)) {
-                    vClockReceive[originalSenderNb - 1]++;
-                    if (locality.contains(originalSenderNb)) {
-                        sendLock.lock();
+        boolean loopAgain = true;
+        while (loopAgain) {
+            loopAgain = false;
+            // For every process
+            for (byte p = 1; p < vClockSend.length + 1; p++) {
+                var iterator = pending.computeIfAbsent(p, key -> new HashSet<>()).iterator();
+                while (iterator.hasNext()) {
+                    var msg = iterator.next();
+                    byte originalSenderNb = msg.getOriginalSenderNb();
+                    if (smallerOrEqual(msg.getVectorClock(), vClockReceive)) {
                         vClockReceive[originalSenderNb - 1]++;
-                        sendLock.unlock();
-                    }
+                        loopAgain = true;
+                        if (locality.contains(originalSenderNb)) {
+                            sendLock.lock();
+                            vClockSend[originalSenderNb - 1]++;
+                            sendLock.unlock();
+                        }
 
-                    observer.deliver(msg);
-                    pending.remove(p);
+                        observer.deliver(msg);
+                        iterator.remove();
+                    } else {
+                        break;
+                    }
                 }
             }
         }
