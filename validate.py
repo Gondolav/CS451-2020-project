@@ -207,10 +207,52 @@ class LCausalBroadcastValidation(Validation):
         # Use the `extraParameter` to pass any information you think is relevant
 
     def generateConfig(self):
-        raise NotImplementedError()
+        hosts = tempfile.NamedTemporaryFile(mode='w')
+        config = tempfile.NamedTemporaryFile(mode='w')
+
+        for i in range(1, self.processes + 1):
+            hosts.write("{} localhost {}\n".format(i, PROCESSES_BASE_IP+i))
+
+        hosts.flush()
+
+        config.write("{}\n".format(self.messages))
+        # TODO: generate config
+        config.flush()
+
+        return (hosts, config)
 
     def checkProcess(self, pid):
-        raise NotImplementedError()
+        filePath = os.path.join(self.outputDirPath, 'proc{:02d}.output'.format(pid))
+
+        i = 1
+        nextMessage = defaultdict(lambda : 1)
+        filename = os.path.basename(filePath)
+
+        with open(filePath) as f:
+            for lineNumber, line in enumerate(f):
+                tokens = line.split()
+
+                # Check broadcast
+                if tokens[0] == 'b':
+                    msg = int(tokens[1])
+                    if msg != i:
+                        print("File {}, Line {}: Messages broadcast out of order. Expected message {} but broadcast message {}".format(filename, lineNumber, i, msg))
+                        return False
+                    i += 1
+
+                # Check delivery
+                if tokens[0] == 'd':
+                    sender = int(tokens[1])
+                    msg = int(tokens[2])
+                    if msg != nextMessage[sender]:
+                        print("File {}, Line {}: Message delivered out of order. Expected message {}, but delivered message {}".format(filename, lineNumber, nextMessage[sender], msg))
+                        return False
+                    else:
+                        nextMessage[sender] = msg + 1
+
+                # TODO: test CRB property
+
+        return True
 
 class StressTest:
     def __init__(self, procs, concurrency, attempts, attemptsRatio):
