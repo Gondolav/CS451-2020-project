@@ -11,8 +11,8 @@ public class LCBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final UniformReliableBroadcast urb;
-    private final int[] vClockSend;
-    private final int[] vClockReceive;
+    private final int[] vClockSend; // stores the dependencies (as sequence numbers) of the messages to send
+    private final int[] vClockReceive; // stores the messages delivered
     private final Set<Byte> locality;
     private int sendSeqNb;
     private final Map<Byte, Set<Message>> pending;
@@ -74,8 +74,11 @@ public class LCBroadcast implements Observer, Broadcast {
                     byte originalSenderNb = msg.getOriginalSenderNb();
                     if (smallerOrEqual(msg.getVectorClock(), vClockReceive)) {
                         vClockReceive[originalSenderNb - 1]++;
+                        // If we delivered some message, we have to loop again to deliver potentially more
                         loopAgain = true;
                         if (locality.contains(originalSenderNb)) {
+                            // We update the dependencies for the new message to send, in such a way that the processes
+                            // affecting this process will deliver message i only after delivering message i-1
                             sendLock.lock();
                             vClockSend[originalSenderNb - 1]++;
                             sendLock.unlock();
@@ -83,8 +86,6 @@ public class LCBroadcast implements Observer, Broadcast {
 
                         observer.deliver(msg);
                         iterator.remove();
-                    } else {
-                        break;
                     }
                 }
             }
