@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
-class FairLossLinks implements Observer, Links {
+final class FairLossLinks implements Observer, Links {
 
     private static final int NB_THREADS = Runtime.getRuntime().availableProcessors() + 1;
 

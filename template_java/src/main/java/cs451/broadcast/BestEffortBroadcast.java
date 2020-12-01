@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class BestEffortBroadcast implements Observer, Broadcast {
+final class BestEffortBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final List<Host> hosts;

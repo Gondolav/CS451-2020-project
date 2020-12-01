@@ -7,7 +7,7 @@ import cs451.utils.Observer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-class StubbornLinks implements Observer, Links {
+final class StubbornLinks implements Observer, Links {
 
     private static final long TIMEOUT = 200L;
 

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Process implements Observer {
+public final class Process implements Observer {
 
     private final byte id;
 

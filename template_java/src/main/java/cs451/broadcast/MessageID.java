@@ -2,7 +2,7 @@ package cs451.broadcast;
 
 import java.util.Objects;
 
-class MessageID {
+final class MessageID {
     final byte senderNb;
     final int messageNb;
 

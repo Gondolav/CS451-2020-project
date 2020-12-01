@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
-public class FIFOBroadcast implements Observer, Broadcast {
+public final class FIFOBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final UniformReliableBroadcast urb;

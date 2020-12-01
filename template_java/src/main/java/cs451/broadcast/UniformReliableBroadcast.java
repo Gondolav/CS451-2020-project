@@ -7,7 +7,7 @@ import cs451.utils.Observer;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-class UniformReliableBroadcast implements Observer, Broadcast {
+final class UniformReliableBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final List<Host> hosts;

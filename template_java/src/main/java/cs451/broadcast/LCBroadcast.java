@@ -7,7 +7,7 @@ import cs451.utils.Observer;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class LCBroadcast implements Observer, Broadcast {
+public final class LCBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final UniformReliableBroadcast urb;

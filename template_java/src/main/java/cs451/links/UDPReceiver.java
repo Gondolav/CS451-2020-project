@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class UDPReceiver extends Thread {
+final class UDPReceiver extends Thread {
     private final Observer observer;
     private final byte[] buf = new byte[65535];
     private final AtomicBoolean running = new AtomicBoolean(false);

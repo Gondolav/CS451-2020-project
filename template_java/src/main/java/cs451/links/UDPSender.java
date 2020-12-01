@@ -8,7 +8,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-class UDPSender implements Runnable {
+final class UDPSender implements Runnable {
     private final DatagramSocket socket;
     private final int port;
     private final Message message;

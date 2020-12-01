@@ -5,7 +5,7 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Message {
+public final class Message {
 
     private final int seqNb;
     private final byte senderNb; // p in the book

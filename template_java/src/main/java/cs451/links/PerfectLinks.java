@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class PerfectLinks implements Observer, Links {
+public final class PerfectLinks implements Observer, Links {
 
     private final Observer observer;
     private final StubbornLinks stubborn;
