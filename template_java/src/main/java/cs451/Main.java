@@ -70,7 +70,7 @@ public class Main {
                 for (String line : configLines.subList(1, size)) {
                     var split = line.split(" ");
                     if (Integer.parseInt(split[0]) == parser.myId()) {
-                        locality = Arrays.stream(split).skip(1).map(Byte::valueOf).collect(Collectors.toUnmodifiableSet());
+                        locality = Arrays.stream(split).map(Byte::valueOf).collect(Collectors.toUnmodifiableSet());
                         break;
                     }
                 }

@@ -11,31 +11,26 @@ public final class LCBroadcast implements Observer, Broadcast {
 
     private final Observer observer;
     private final UniformReliableBroadcast urb;
-    //    private final int[] vClockSend; // stores the dependencies (as sequence numbers) of the messages to send
-//    private final int[] vClockReceive; // stores the messages delivered
-    private final int[] vClock;
+    private final int[] vClockSend; // stores the dependencies (as sequence numbers) of the messages to send
+    private final int[] vClockReceive; // stores the messages delivered
     private final Set<Byte> locality;
     private int sendSeqNb;
-    //    private final Map<Byte, Set<Message>> pending;
-    private final Map<MessageID, Message> pending;
+    private final Map<Byte, Set<Message>> pending;
     private final byte rank;
 
-    //    private final ReentrantLock sendLock = new ReentrantLock();
-//    private final ReentrantLock receiveLock = new ReentrantLock();
-    private final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock sendLock = new ReentrantLock();
+    private final ReentrantLock receiveLock = new ReentrantLock();
 
     public LCBroadcast(Observer observer, List<Host> hosts, int port, Map<Byte, Host> senderNbToHosts, byte senderNb, Set<Byte> locality, byte rank) {
         this.observer = observer;
         this.urb = new UniformReliableBroadcast(this, hosts, port, senderNbToHosts, senderNb);
-//        this.vClockSend = new int[senderNbToHosts.size()];
-//        this.vClockReceive = new int[senderNbToHosts.size()];
-        this.vClock = new int[senderNbToHosts.size()];
+        this.vClockSend = new int[senderNbToHosts.size()];
+        this.vClockReceive = new int[senderNbToHosts.size()];
         this.pending = new HashMap<>();
         for (int i = 0; i < senderNbToHosts.size(); i++) {
-//            vClockSend[i] = 0;
-//            vClockReceive[i] = 0;
-            vClock[i] = 0;
-//            pending.put((byte) (i + 1), new HashSet<>());
+            vClockSend[i] = 0;
+            vClockReceive[i] = 0;
+            pending.put((byte) i, new HashSet<>());
         }
         this.locality = new HashSet<>(locality);
         this.sendSeqNb = 0;
@@ -44,14 +39,11 @@ public final class LCBroadcast implements Observer, Broadcast {
 
     @Override
     public void broadcast(Message message) {
-//        sendLock.lock();
-        lock.lock();
-//        int[] w = vClockSend.clone();
-        int[] w = vClock.clone();
+        sendLock.lock();
+        int[] w = vClockSend.clone();
         w[rank] = sendSeqNb;
         sendSeqNb++;
-//        sendLock.unlock();
-        lock.unlock();
+        sendLock.unlock();
 
         urb.broadcast(new Message(message.getSeqNb(), message.getSenderNb(), message.getOriginalSenderNb(), message.isAck(), w));
     }
@@ -68,69 +60,41 @@ public final class LCBroadcast implements Observer, Broadcast {
 
     @Override
     public void deliver(Message message) {
-//        receiveLock.lock();
-        lock.lock();
-        var messageID = new MessageID(message.getOriginalSenderNb(), message.getSeqNb());
-        pending.put(messageID, message);
+        receiveLock.lock();
 
-        var iterator = pending.entrySet().iterator();
-        while (iterator.hasNext()) {
-            var entry = iterator.next();
-            var msg = entry.getValue();
-            var originalSenderNb = msg.getOriginalSenderNb();
-            if (smallerOrEqual(msg.getVectorClock(), vClock)) {
-                vClock[originalSenderNb - 1]++;
-                // If we delivered some message, we have to loop again to deliver potentially more
-//                        loopAgain = true;
-//                        if (locality.contains(originalSenderNb)) {
-//                            // We update the dependencies for the new message to send, in such a way that the processes
-//                            // affecting this process will deliver message i only after delivering message i-1
-//                            sendLock.lock();
-//                            vClockSend[originalSenderNb - 1]++;
-//                            sendLock.unlock();
-//                        }
+        pending.computeIfAbsent((byte) (message.getOriginalSenderNb() - 1), b -> new HashSet<>()).add(message);
 
-                observer.deliver(msg);
-                iterator.remove();
+        boolean loopAgain = true;
+        while (loopAgain) {
+            loopAgain = false;
+            // For every process
+            for (byte p = 0; p < vClockReceive.length; p++) {
+                var iterator = pending.get(p).iterator();
+                while (iterator.hasNext()) {
+                    var msg = iterator.next();
+                    if (smallerOrEqual(msg.getVectorClock(), vClockReceive)) {
+                        vClockReceive[p]++;
+                        // If we delivered some message, we have to loop again to deliver potentially more
+                        loopAgain = true;
+                        if (locality.contains((byte) (p + 1))) {
+                            // We update the dependencies for the new message to send, in such a way that the processes
+                            // affecting this process will deliver message i only after delivering message i-1
+                            sendLock.lock();
+                            vClockSend[p]++;
+                            sendLock.unlock();
+                        }
+
+                        observer.deliver(msg);
+                        iterator.remove();
+                    }
+                }
             }
         }
-//        boolean loopAgain = true;
-//        while (loopAgain) {
-//            loopAgain = false;
-//            // For every process
-//            for (byte p = 1; p < vClock.length + 1; p++) {
-//                var iterator = pending.computeIfAbsent(p, key -> new HashSet<>()).iterator();
-//                while (iterator.hasNext()) {
-//                    var msg = iterator.next();
-//                    byte originalSenderNb = msg.getOriginalSenderNb();
-//                    if (smallerOrEqual(msg.getVectorClock(), vClock)) {
-//                        vClock[originalSenderNb - 1]++;
-//                        // If we delivered some message, we have to loop again to deliver potentially more
-//                        loopAgain = true;
-////                        if (locality.contains(originalSenderNb)) {
-////                            // We update the dependencies for the new message to send, in such a way that the processes
-////                            // affecting this process will deliver message i only after delivering message i-1
-////                            sendLock.lock();
-////                            vClockSend[originalSenderNb - 1]++;
-////                            sendLock.unlock();
-////                        }
-//
-//                        observer.deliver(msg);
-//                        iterator.remove();
-//                    }
-//                }
-//            }
-//        }
 
-//        receiveLock.unlock();
-        lock.unlock();
+        receiveLock.unlock();
     }
 
     private boolean smallerOrEqual(int[] vc1, int[] vc2) {
-//        var toCompare = locality.stream().mapToInt(b -> b - 1);
-//        for (var i : toCompare.toArray()) {
-//            if (vc1[i] > vc2[i]) return false;
-//        }
         for (int i = 0; i < vc1.length; i++) {
             if (vc1[i] > vc2[i]) return false;
         }
