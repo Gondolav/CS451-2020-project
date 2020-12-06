@@ -23,14 +23,14 @@ final class UniformReliableBroadcast implements Observer, Broadcast {
         this.observer = observer;
         this.hosts = new ArrayList<>(hosts);
         this.beb = new BestEffortBroadcast(this, hosts, port, senderNbToHosts, senderNb);
-        this.delivered = new HashSet<>();
-        this.pending = new HashMap<>();
-        this.ack = new HashMap<>();
+        this.delivered = new HashSet<>(1000);
+        this.pending = new HashMap<>(1000);
+        this.ack = new HashMap<>(1000);
         this.senderNb = senderNb;
     }
 
     private boolean canDeliver(MessageID messageID) {
-        return 2 * ack.getOrDefault(messageID, new HashSet<>()).size() > hosts.size();
+        return 2 * ack.getOrDefault(messageID, new HashSet<>(1000)).size() > hosts.size();
     }
 
     @Override
@@ -59,7 +59,7 @@ final class UniformReliableBroadcast implements Observer, Broadcast {
 
         lock.lock();
 
-        ack.computeIfAbsent(receivedMessageID, m -> new HashSet<>()).add(message.getSenderNb());
+        ack.computeIfAbsent(receivedMessageID, m -> new HashSet<>(1000)).add(message.getSenderNb());
 
         if (!pending.containsKey(receivedMessageID)) {
             pending.put(receivedMessageID, message);

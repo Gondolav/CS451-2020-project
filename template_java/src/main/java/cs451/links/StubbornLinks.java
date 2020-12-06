@@ -25,7 +25,7 @@ final class StubbornLinks implements Observer, Links {
     StubbornLinks(Observer observer, int port, Map<Byte, Host> senderNbToHosts, byte senderNb) {
         this.observer = observer;
         this.fairLoss = new FairLossLinks(this, port);
-        this.sent = new ConcurrentHashMap<>();
+        this.sent = new ConcurrentHashMap<>(1000);
 
         this.timer = new Timer();
 

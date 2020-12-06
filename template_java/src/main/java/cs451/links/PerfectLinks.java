@@ -19,7 +19,7 @@ public final class PerfectLinks implements Observer, Links {
     public PerfectLinks(Observer observer, int port, Map<Byte, Host> senderNbToHosts, byte senderNb) {
         this.observer = observer;
         this.stubborn = new StubbornLinks(this, port, senderNbToHosts, senderNb);
-        this.delivered = new HashSet<>();
+        this.delivered = new HashSet<>(1000);
     }
 
     @Override
