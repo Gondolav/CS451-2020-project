@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -62,17 +63,15 @@ public class Main {
         }
 
         int nbMessagesToBroadcast = 0;
-        Set<Byte> locality = null;
+        HashMap<Byte, Set<Byte>> locality = new HashMap<>();
         if (configLines != null) {
             nbMessagesToBroadcast = Integer.parseInt(configLines.get(0));
             int size = configLines.size();
             if (size > 1) {
                 for (String line : configLines.subList(1, size)) {
                     var split = line.split(" ");
-                    if (Integer.parseInt(split[0]) == parser.myId()) {
-                        locality = Arrays.stream(split).map(Byte::valueOf).collect(Collectors.toUnmodifiableSet());
-                        break;
-                    }
+                    byte process = Byte.parseByte(split[0]);
+                    locality.put(process, Arrays.stream(split).map(Byte::valueOf).collect(Collectors.toUnmodifiableSet()));
                 }
             }
         }
@@ -80,7 +79,7 @@ public class Main {
         // Go through each host, find the one associated to our id, create new process and new list of hosts
         for (var host : parser.hosts()) {
             if (host.getId() == parser.myId()) {
-                if (locality != null) {
+                if (!locality.isEmpty()) {
                     System.out.println(locality.toString());
                     // LCBroadcast
                     pr = new Process(host.getId(), host.getPort(), nbMessagesToBroadcast, parser.hosts(), parser.output(), locality);

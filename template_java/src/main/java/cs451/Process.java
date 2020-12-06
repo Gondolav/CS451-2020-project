@@ -37,7 +37,7 @@ public final class Process implements Observer {
         this.broadcast = new FIFOBroadcast(this, hosts, port, senderNbToHosts, this.id);
     }
 
-    public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output, Set<Byte> locality) {
+    public Process(int id, int port, int nbMessagesToBroadcast, List<Host> hosts, String output, Map<Byte, Set<Byte>> locality) {
         this.id = (byte) id;
         this.nbMessagesToBroadcast = nbMessagesToBroadcast;
         this.output = output;
@@ -48,7 +48,7 @@ public final class Process implements Observer {
             senderNbToHosts.put((byte) host.getId(), host);
         }
 
-        this.broadcast = new LCBroadcast(this, hosts, port, senderNbToHosts, this.id, new HashSet<>(locality), (byte) (this.id - 1));
+        this.broadcast = new LCBroadcast(this, hosts, port, senderNbToHosts, this.id, new HashMap<>(locality), (byte) (this.id - 1));
     }
 
     public void startBroadcasting() {
