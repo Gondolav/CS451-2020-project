@@ -80,6 +80,7 @@ public final class LCBroadcast implements Observer, Broadcast {
     }
 
     private boolean smallerOrEqual(int[] vc1, int[] vc2, Set<Byte> dependencies) {
+        // Compare the two vector clocks only for the dependencies of the first, which corresponds to the message VC
         int[] deps = dependencies.stream().mapToInt(b -> b - 1).toArray();
         for (int i : deps) {
             if (vc1[i] > vc2[i]) return false;
